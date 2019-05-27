@@ -1,0 +1,56 @@
+﻿  Box3D.cpp
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\geometry\box3d.h(10): fatal error C1083: 포함 파일을 열 수 없습니다. 'DataStructure/Vector3D.h': No such file or directory
+  ObjFileReader.cpp
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\geometry\triangularsurface\objfilereader.h(9): fatal error C1083: 포함 파일을 열 수 없습니다. 'DataStructure/Array1D.h': No such file or directory
+  StaticTriangleOperations.cpp
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\geometry\triangularsurface\statictriangleoperations.h(11): fatal error C1083: 포함 파일을 열 수 없습니다. 'GenericDefinitions.h': No such file or directory
+  StaticTriangularSurface.cpp
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\geometry\triangularsurface\statictriangularsurface.cpp(10): fatal error C1083: 포함 파일을 열 수 없습니다. 'ConventionalMacros.h': No such file or directory
+  GL_VIEW.cpp
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\gl2\gl_view.cpp(160): warning C4244: '인수': 'int'에서 'const float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  main.cpp
+c:\program files (x86)\windows kits\10\include\10.0.17763.0\shared\minwindef.h(130): warning C4005: 'APIENTRY': 매크로 재정의
+  c:\users\johnc\vcpkg\installed\x86-windows\include\glfw\glfw3.h(98): note: 'APIENTRY'의 이전 정의를 참조하십시오.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\gl2\gl2_material.h(50): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(32): warning C4305: '=': 'double'에서 'float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(37): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(43): warning C4244: '=': 'double'에서 'TT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+          with
+          [
+              TT=float
+          ]
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(50): warning C4305: '+=': 'double'에서 'float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(57): warning C4305: '인수': 'double'에서 'const TT'(으)로 잘립니다.
+          with
+          [
+              TT=float
+          ]
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(59): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(60): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(63): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(81): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(83): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(97): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\particlesystem.h(99): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\callback.h(6): warning C4244: '인수': 'double'에서 'const float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\callback.h(16): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\callback.h(22): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\callback.h(30): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\callback.h(37): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\callback.h(45): warning C4244: '인수': 'double'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(61): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(62): warning C4244: '=': 'float'에서 'int'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(101): warning C4305: '초기화 중': 'double'에서 'float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(138): warning C4305: '인수': 'double'에서 'const T'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(139): warning C4244: '인수': 'double'에서 'const TT'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+          with
+          [
+              TT=float
+          ]
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(177): warning C4305: '인수': 'double'에서 'const float'(으)로 잘립니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(213): warning C4018: '<': signed 또는 unsigned가 일치하지 않습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(220): warning C4244: '초기화 중': 'double'에서 'float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\main.cpp(220): warning C4244: '초기화 중': 'double'에서 'const float'(으)로 변환하면서 데이터가 손실될 수 있습니다.
+  Quaternion.cpp
+c:\users\johnc\desktop\week_13_physically_based_animation\chess\math\quaternion.h(8): fatal error C1083: 포함 파일을 열 수 없습니다. 'GenericDefinitions.h': No such file or directory
+  코드를 생성하고 있습니다...
