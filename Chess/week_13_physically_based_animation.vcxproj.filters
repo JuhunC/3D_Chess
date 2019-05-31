@@ -68,5 +68,8 @@
     <ClInclude Include="callback.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="chess.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -132,6 +132,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="callback.h" />
+    <ClInclude Include="chess.h" />
     <ClInclude Include="Geometry\Box3D.h" />
     <ClInclude Include="Geometry\TriangularSurface\ObjFileReader.h" />
     <ClInclude Include="Geometry\TriangularSurface\StaticTriangleOperations.h" />

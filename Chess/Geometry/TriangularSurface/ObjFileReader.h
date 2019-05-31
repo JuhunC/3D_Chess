@@ -22,7 +22,6 @@ public:
 	LinkedArray<TV_INT> uv_ix_stack_;
 	LinkedArray<TV_INT> nor_ix_stack_;
 
-	//
 	Array1D<TV3> posArray;
 	Array1D<TV3> norArray;
 	Array1D<TV2> texArray;

@@ -1,8 +1,3 @@
-/*
-Authored by Prof. Jeong-Mo Hong, CSE Dongguk University
-for Introduction to Computer Graphics, 2017 Spring
-*/
-
 #pragma once
 
 #include <iostream>
@@ -15,11 +10,13 @@ for Introduction to Computer Graphics, 2017 Spring
 class OBJReader
 {
 public:
-	std::vector<glm::vec3 > pos_stack_;
+	std::vector<glm::vec3> pos_stack_;
 	std::vector<glm::tvec3<unsigned int> > ix_stack_;
+	std::vector<glm::vec3> nor_stack_;
 	//Note: vector push_back is slow
 	//Note: use unsigned int for indices
-
+	glm::vec3 min;
+	glm::vec3 max;
 	void readObj(const char* filename)
 	{
 		using namespace std;
@@ -31,15 +28,15 @@ public:
 
 		const float max_limit = std::numeric_limits<float>::max();
 		const float min_limit = std::numeric_limits<float>::min();
-
-		Vector3<float> min(max_limit, max_limit, max_limit);
-		Vector3<float> max(min_limit, min_limit, min_limit);
+		Vector3<float> min = Vector3<float>(max_limit, max_limit, max_limit);
+		Vector3<float> max = Vector3<float>(min_limit, min_limit, min_limit);
 
 		ifstream file(filename);
 
 		// check if file is opened correctly
-		if (file.is_open() == false) { 
-			std::cout << filename << " does not exist. Program terminated." << std::endl; exit(-1); }
+		if (file.is_open() == false) {
+			std::cout << filename << " does not exist. Program terminated." << std::endl; exit(-1);
+		}
 
 		char c[255];
 
@@ -82,6 +79,8 @@ public:
 
 				float nx, ny, nz;
 				file >> nx >> ny >> nz;
+
+				nor_stack_.push_back(glm::vec3(nx, ny, nz)); // added
 			}
 			else if (strcmp(c, "f") == 0)
 			{
@@ -142,7 +141,8 @@ public:
 		min.print();
 		std::cout << " ";
 		max.print();
-
+		this->min = glm::vec3(min.x_, min.y_, min.z_);
+		this->max = glm::vec3(max.x_, max.y_, max.z_);
 		// move center to origin
 		for (int i = 0; i < pos_stack_.size(); i++)
 		{
@@ -185,23 +185,53 @@ public:
 
 	void recalculateNormalVector()
 	{
+		using namespace std; using namespace glm;
 		// 1. calculate face normals
 
 		// prepare for a temporary memory
-
+		vector<vec3> face_normals;
+		face_normals.resize(ix_stack_.size());// number of triangles
 		// use cross product to calculate face normals
+		for (int i = 0; i < ix_stack_.size(); i++) {
+			const unsigned int v0 = ix_stack_[i][0];
+			const unsigned int v1 = ix_stack_[i][1];
+			const unsigned int v2 = ix_stack_[i][2];
+
+			const vec3 l0 = pos_stack_[v1] - pos_stack_[v0];
+			const vec3 l1 = pos_stack_[v2] - pos_stack_[v1];
+
+			const vec3 normal = glm::cross(l0, l1); // Cross Product
+
+			face_normals[i] = normal;
+		}
 
 
 		// 2. find vertex normals
 
 		// prepare for memory to store normal vectors
-
+		nor_stack_.clear();
+		nor_stack_.resize(pos_stack_.size()); // by number of vertexes
 
 		// make normal vectors zeros
+		for (int i = 0; i < nor_stack_.size(); i++) {
+			nor_stack_[i] = vec3(0.0f, 0.0f, 0.0f);
+		}
 
 		// accumulate face normals
+		for (int i = 0; i < ix_stack_.size(); i++) {
+			glm::vec3& n0 = nor_stack_[ix_stack_[i][0]];
+			glm::vec3& n1 = nor_stack_[ix_stack_[i][1]];
+			glm::vec3& n2 = nor_stack_[ix_stack_[i][2]];
+
+			// add face normals
+			n0 += face_normals[i];
+			n1 += face_normals[i];
+			n2 += face_normals[i];
+		}
 
 		// normalize vertex normals for smooth average face normals
-
+		for (int i = 0; i < nor_stack_.size(); i++) {
+			nor_stack_[i] = glm::normalize(nor_stack_[i]);
+		}
 	}
 };

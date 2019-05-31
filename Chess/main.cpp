@@ -21,13 +21,25 @@
 #include "GL2/GL2_Material.h"
 #include "ParticleSystem.h"
 #include "callback.h"
-#define BOARD_SIZE 8
+#include "chess.h"
+#include "ObjReader.h"
+
 #define NUM_PARTICLES 1000
 int width_window = 640;
 int height_window = 480;
 const std::string board_file[] =  {"./images/chess_board_2_in.obj","./images/chess_board_2_out.obj",
 						"./images/chess_board_3_in.obj","./images/chess_board_3_out.obj",
-						"./images/chess_board_4_in.obj","./images/chess_board_4_out.obj"};
+						"./images/chess_board_4_in.obj","./images/chess_board_4_out.obj"
+};
+const std::string piece_file[] = {
+						"./images/pieces/original/King_repaired.obj",
+						"./images/pieces/original/Queen_repaired.obj",
+						"./images/pieces/original/Bishop_repaired.obj",
+						"./images/pieces/original/Knight_repaired.obj",
+						"./images/pieces/original/Rook_repaired.obj",
+						"./images/pieces/original/Pawn_repaired.obj"
+};
+
 int board[8][8] = {
 	{5,4,5,4,5,4,5,4},
 	{4,5,4,5,4,5,4,5},
@@ -47,6 +59,7 @@ int board[8][8] = {
 	{3,4,5,4,5,4,5,2},
 	{1,3,2,3,2,3,2,0}*/
 };
+
 int main(int argc, char *argv[])
 {
 	GLFWwindow *window = nullptr;
@@ -111,25 +124,12 @@ int main(int argc, char *argv[])
 
 
 	StaticTriangularSurface surface;
-//	StaticTriangularSurface** surface = (StaticTriangularSurface**)malloc(sizeof(StaticTriangularSurface*)*BOARD_SIZE);
-//	for (int i = 0; i < BOARD_SIZE; i++) {
-//		surface[i] = (StaticTriangularSurface*)malloc(sizeof(StaticTriangularSurface) * BOARD_SIZE);
-//	}
-//	for (int i = 0; i < BOARD_SIZE; i++) {
-//		for (int j = 0; j < BOARD_SIZE; j++) {
-//			surface[i][j] = StaticTriangularSurface();
-//			//surface[i][j].readObj("./images/chess_board_2_in.obj", true, true);
-//			surface[i][j].readObj(board_file[board[i][j]].c_str(), true, true);
-//			//surface[i][j].translate(TV(0.1*i, 0.1*j, 0.0));
-//			//surface.scale(ps.obj.radius*2.0f);
-//			//surface.translate(ps.obj.center);
-//		}
-//	}
-	
+
 	//surface.readObj("./images/chess_board_2_in.obj", true, true);
 	//surface.readObj("./images/chess_board_4_out.obj", true, true);
 	// object setting
 	
+	// Board Object Setting
 	GL2_Object** gl_obj=(GL2_Object**)malloc(sizeof(GL2_Object*)*BOARD_SIZE);
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		gl_obj[i] = (GL2_Object*)malloc(sizeof(GL2_Object)*BOARD_SIZE);
@@ -148,12 +148,67 @@ int main(int argc, char *argv[])
 				gl_obj[i][j].mat_.setRed();
 			}
 		}
-		
+	}
+
+	// Piece Object Setting
+	int tmp;
+	obj*** pc_obj = (obj***)malloc(sizeof(obj**)*2);
+	for (int i = 0; i < 2; i++) {
+		pc_obj[i] = (obj**)malloc(sizeof(obj*)*PIECE_NUM);
+		for (int j = 0; j < PIECE_NUM; j++) {
+			switch (j) {
+			case 0:
+				tmp = 0; break; // King
+			case 1:
+				tmp = 1; break; // Queen
+			case 2: case 3:
+				tmp = 2; break; // Bishop
+			case 4: case 5:
+				tmp = 3; break; // Knight
+			case 6: case 7:
+				tmp = 3; break; // Rook
+			default:
+				tmp = 5; break; // Pawn
+			}
+			pc_obj[i][j] = new obj(piece_file[tmp].c_str());
+			pc_obj[i][j]->scale(0.1);
+			pc_obj[i][j]->translate(glm::vec3(0, 0.05, 0));
+			pc_obj[i][j]->BindBuffer();
+			
+			
+			/*pc_obj[i][j].translate(glm::vec3(0.1*i, 0.0, 0.1*j));
+			pc_obj[i][j].updateBuffer();*/
+			/*surface.readObj(piece_file[tmp].c_str(), true, true);
+			surface.scale(0.1);
+
+			surface.translate(TV(0.0, 0.05, 0.0));*/
+			
+			if (i == 0) {
+				pc_obj[i][j]->mat_.setGold();
+			}
+			else {
+				pc_obj[i][j]->mat_.setRed();
+			}
+			
+		}
 	}
 	
 	//gl_obj.initPhongSurface(surface);
 	//gl_obj.mat_.setRed();
 	
+	// Board Pieces Pointer
+	obj*** brd_pc_ptr = (obj***)malloc(sizeof(obj**) * BOARD_SIZE);
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		brd_pc_ptr[i] = (obj**)malloc(sizeof(obj*)*BOARD_SIZE);
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			brd_pc_ptr[i][j] = nullptr;
+		}
+	}
+
+	mapPieces2Board(pc_obj, brd_pc_ptr);
+	/*obj ob1(piece_file[0].c_str());
+	ob1.BindBuffer();*/
+	//ob1.translate(glm::vec3(0.1, 0.0, 0.1));
 
 	// depth test
 	glEnable(GL_DEPTH_TEST);
@@ -194,12 +249,31 @@ int main(int argc, char *argv[])
 				gl_obj[i][j].drawWithShader(gl_world.shaders_);
 			}
 		}
+
+		//ob1.applyLighting(light);
+		
+		for (int i = 0; i < BOARD_SIZE; i++) {
+			for (int j = 0; j < BOARD_SIZE; j++) {
+				if (brd_pc_ptr[i][j] != nullptr) {
+					brd_pc_ptr[i][j]->applyLighting(light);
+					//brd_pc_ptr[i][j]->updateBuffer();
+					brd_pc_ptr[i][j]->drawWithShader(gl_world.shaders_);
+				}
+				/*if (brd_pc_ptr[i][j] != nullptr) {
+				
+					
+					brd_pc_ptr[i][j]->applyLighting(light);
+					brd_pc_ptr[i][j]->drawWithShader(gl_world.shaders_);
+				}*/
+			}
+		}
+		
+		//ob1.drawWithShader(gl_world.shaders_);
 		//gl_obj.applyLighting(light);
 		//gl_obj.drawWithShader(gl_world.shaders_);
 		//gl_obj.drawPhongSurface();
 
 		glUseProgram(0);
-
 		// Old-style rendering
 		glLoadMatrixf(&vp[0][0]);
 
@@ -210,6 +284,7 @@ int main(int argc, char *argv[])
 		// draw particles
 		// old version
 		
+		//ob1.updateBuffer();
 		
 		for (int p = 0; p < ps.particles.size(); p++) {
 			const TV red = TV(1.0f, 0.0f, 0.0f);
