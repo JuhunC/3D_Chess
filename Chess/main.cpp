@@ -28,26 +28,22 @@
 int width_window = 640;
 int height_window = 480;
 
+int ptr_dx=0, ptr_dz = 0;
 
-int board[8][8] = {
-	{5,4,5,4,5,4,5,4},
-	{4,5,4,5,4,5,4,5},
-	{5,4,5,4,5,4,5,4},
-	{4,5,4,5,4,5,4,5},
-	{5,4,5,4,5,4,5,4},
-	{4,5,4,5,4,5,4,5},
-	{5,4,5,4,5,4,5,4},
-	{4,5,4,5,4,5,4,5}
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+		ptr_dz = 1;
+	}else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS){
+		ptr_dz = -1;
+	}
+	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+		ptr_dx = 1;
+	}
+	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+		ptr_dx = -1;
+	}
+}
 
-	/*{0,2,3,2,3,2,3,1},
-	{2,5,4,5,4,5,4,3},
-	{3,4,5,4,5,4,5,2},
-	{2,5,4,5,4,5,4,3},
-	{3,4,5,4,5,4,5,2},
-	{2,5,4,5,4,5,4,3},
-	{3,4,5,4,5,4,5,2},
-	{1,3,2,3,2,3,2,0}*/
-};
 
 int main(int argc, char *argv[])
 {
@@ -72,6 +68,7 @@ int main(int argc, char *argv[])
 	}
 
 	// callbacks here
+	glfwSetKeyCallback(window, key_callback);
 	glfwSetScrollCallback(window, scroll_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
@@ -114,16 +111,16 @@ int main(int argc, char *argv[])
 
 	StaticTriangularSurface surface;
 
-	//surface.readObj("./images/chess_board_2_in.obj", true, true);
-	//surface.readObj("./images/chess_board_4_out.obj", true, true);
-	// object setting
 	
 	// Board Object Setting
 	GL2_Object** gl_obj=(GL2_Object**)malloc(sizeof(GL2_Object*)*BOARD_SIZE);
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		gl_obj[i] = (GL2_Object*)malloc(sizeof(GL2_Object)*BOARD_SIZE);
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			surface.readObj(board_file[board[i][j]].c_str(), true, true);
+			if(i+j%2 ==0)
+				surface.readObj(board_file[4].c_str(), true, true);
+			else
+				surface.readObj(board_file[5].c_str(), true, true);
 			surface.scale(0.1);
 			
 			surface.translate(TV(0.1*i, 0.0, 0.1*j));
@@ -138,66 +135,6 @@ int main(int argc, char *argv[])
 			}
 		}
 	}
-
-	// Piece Object Setting
-	//int tmp;
-	//obj*** pc_obj = (obj***)malloc(sizeof(obj**)*2);
-	//for (int i = 0; i < 2; i++) {
-	//	pc_obj[i] = (obj**)malloc(sizeof(obj*)*PIECE_NUM);
-	//	for (int j = 0; j < PIECE_NUM; j++) {
-	//		switch (j) {
-	//		case 0:
-	//			tmp = 0; break; // King
-	//		case 1:
-	//			tmp = 1; break; // Queen
-	//		case 2: case 3:
-	//			tmp = 2; break; // Bishop
-	//		case 4: case 5:
-	//			tmp = 3; break; // Knight
-	//		case 6: case 7:
-	//			tmp = 3; break; // Rook
-	//		default:
-	//			tmp = 5; break; // Pawn
-	//		}
-	//		pc_obj[i][j] = new obj(piece_file[tmp].c_str());
-	//		pc_obj[i][j]->scale(0.1);
-	//		pc_obj[i][j]->translate(glm::vec3(0, 0.05, 0));
-	//		pc_obj[i][j]->BindBuffer();
-	//		
-	//		
-	//		/*pc_obj[i][j].translate(glm::vec3(0.1*i, 0.0, 0.1*j));
-	//		pc_obj[i][j].updateBuffer();*/
-	//		/*surface.readObj(piece_file[tmp].c_str(), true, true);
-	//		surface.scale(0.1);
-
-	//		surface.translate(TV(0.0, 0.05, 0.0));*/
-	//		
-	//		if (i == 0) {
-	//			pc_obj[i][j]->mat_.setGold();
-	//		}
-	//		else {
-	//			pc_obj[i][j]->mat_.setRed();
-	//		}
-	//		
-	//	}
-	//}
-	
-	//gl_obj.initPhongSurface(surface);
-	//gl_obj.mat_.setRed();
-	
-	// Board Pieces Pointer
-	/*obj*** brd_pc_ptr = (obj***)malloc(sizeof(obj**) * BOARD_SIZE);
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		brd_pc_ptr[i] = (obj**)malloc(sizeof(obj*)*BOARD_SIZE);
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			brd_pc_ptr[i][j] = nullptr;
-		}
-	}
-
-	mapPieces2Board(pc_obj, brd_pc_ptr);*/
-	/*obj ob1(piece_file[0].c_str());
-	ob1.BindBuffer();*/
-	//ob1.translate(glm::vec3(0.1, 0.0, 0.1));
 
 	// depth test
 	glEnable(GL_DEPTH_TEST);
@@ -221,9 +158,6 @@ int main(int argc, char *argv[])
 		// update particle system
 		ps.advanceOneTimeStep(0.001);
 
-
-
-
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -239,29 +173,13 @@ int main(int argc, char *argv[])
 			}
 		}
 
-		//ob1.applyLighting(light);
+		// Check Pointer Movement
+		my_chess.pointer_move(ptr_dx, ptr_dz);
+		ptr_dx = 0; ptr_dz = 0;
+
+		// Draw Chess Pieces
 		my_chess.applyLighting(light);
 		my_chess.drawBoardWithShader(gl_world.shaders_);
-		//for (int i = 0; i < BOARD_SIZE; i++) {
-		//	for (int j = 0; j < BOARD_SIZE; j++) {
-		//		if (brd_pc_ptr[i][j] != nullptr) {
-		//			brd_pc_ptr[i][j]->applyLighting(light);
-		//			brd_pc_ptr[i][j]->updateBuffer();
-		//			brd_pc_ptr[i][j]->drawWithShader(gl_world.shaders_);
-		//		}
-		//		/*if (brd_pc_ptr[i][j] != nullptr) {
-		//		
-		//			
-		//			brd_pc_ptr[i][j]->applyLighting(light);
-		//			brd_pc_ptr[i][j]->drawWithShader(gl_world.shaders_);
-		//		}*/
-		//	}
-		//}
-		
-		//ob1.drawWithShader(gl_world.shaders_);
-		//gl_obj.applyLighting(light);
-		//gl_obj.drawWithShader(gl_world.shaders_);
-		//gl_obj.drawPhongSurface();
 
 		glUseProgram(0);
 		// Old-style rendering

@@ -39,7 +39,14 @@ public:
 		emission_ = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 		shininess_ = 5.0;
 	}
-
+	void setPointer() {
+		//Yellow rubber
+		ambient_ = glm::vec4(0.05f,0.05f,0.0f,1.0f);
+		diffuse_ = glm::vec4(0.5f, 0.5f, 0.4f, 1.0f);
+		specular_ = glm::vec4(0.7f, 0.7f, 0.04f, 1.0f);
+		emission_ = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		shininess_ = 10.0f;
+	}
 	void setGold()
 	{
 		// http://www.it.hiof.no/~borres/j3d/explain/light/p-materials.html

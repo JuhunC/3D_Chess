@@ -63,15 +63,14 @@ public:
 			&obj_reader.ix_stack_[0], GL_STATIC_DRAW);
 	}
 	void translate(glm::vec3 t) {
-		std::cout << t.x << t.y<<t.z << std::endl;
 		for (int i = 0; i < obj_reader.pos_stack_.size(); i++) {
 			obj_reader.pos_stack_[i].x += t.x;
 			obj_reader.pos_stack_[i].y += t.y;
 			obj_reader.pos_stack_[i].z += t.z;
 		}
 	}
-	void rotate(float rot_rate) {
-		glm::quat rot = glm::angleAxis(3.14f / 4.0f * rot_rate, glm::vec3(1.0f, 0.0f, 0.0f)); // rotate by x axis
+	void rotate(float rot_rate, glm::vec3 dir) {
+		glm::quat rot = glm::angleAxis(3.14f / 4.0f * rot_rate, dir); // rotate by x axis
 		glm::mat4 m_rot = glm::toMat4(rot); // quaternion to 4x4 matrix
 		glm::vec4 v4;
 		for (int i = 0; i < obj_reader.pos_stack_.size(); i++) {
@@ -149,15 +148,6 @@ public:
 
 		const int num = obj_reader.pos_stack_.size();
 
-		// move center to origin
-		// move center to origin
-		/*for (int j = 0; j < obj_reader.pos_stack_.size(); j++)
-		{
-			obj_reader.pos_stack_[j].x -= (obj_reader.max.x + obj_reader.min.x)*0.5;
-			obj_reader.pos_stack_[j].y -= (obj_reader.max.y + obj_reader.min.y)*0.5;
-			obj_reader.pos_stack_[j].z -= (obj_reader.max.z + obj_reader.min.z)*0.5;
-		}*/
-
 		const float dx = obj_reader.max.x - obj_reader.min.x;
 		const float dy = obj_reader.max.y - obj_reader.min.y;
 		const float dz = obj_reader.max.z - obj_reader.min.z;
@@ -171,24 +161,7 @@ public:
 			obj_reader.pos_stack_[j].z *= sz;
 		}
 		obj_reader.recalculateNormalVector();
-		for (int i = 0; i < num; i++)
-		{
-			
-			//TV vp = TV(obj_reader.pos_stack_[i].x, obj_reader.pos_stack_[i].y, obj_reader.pos_stack_[i].z);
 
-			//if (centered == true) vp -= center;
-			////std::cout << vp << std::endl;
-			//vp.x_ *= sx;
-			//vp.y_ *= sy;
-			//vp.z_ *= sz;
-			////std::cout << vp << std::endl;
-			//if (centered == true) vp += center;
-
-			//obj_reader.pos_stack_[i].x = vp.x_;
-			//obj_reader.pos_stack_[i].y = vp.y_;
-			//obj_reader.pos_stack_[i].z = vp.z_;
-		}
-		
 	}
 	Box3D<T> getAABB() const
 	{
@@ -206,7 +179,6 @@ public:
 			max.y_ = MAX2(max.y_, obj_reader.pos_stack_[v_ix].y);
 			max.z_ = MAX2(max.z_, obj_reader.pos_stack_[v_ix].z);
 		}
-		std::cout << min << "\t" << max << std::endl;
 		return Box3D<T>(min, max);
 	}
 
@@ -325,12 +297,49 @@ public:
 	void setType(PC type_) { this->type_ = type_; this->type = PC(type_); }
 	obj* getObjPtr() { return pc_obj; }
 };
+class Pointer {
+public:
+	int x, z;
+	obj* ptr_obj;
+	Pointer(int z, int x) {
+		this->x = x;
+		this->z = z;
+		ptr_obj = new obj("./images/Pointer.obj");
+		ptr_obj->scale(0.1);
+		ptr_obj->rotate(4, glm::vec3(1,0,0));
+		ptr_obj->translate(glm::vec3(0.1*this->x, 0.15, 0.1*this->z));
+		ptr_obj->BindBuffer();
+		ptr_obj->mat_.setPointer();
+	}
+	void move(int dx, int dz) {
+		if (this->x + dx >= 0 && this->x + dx < BOARD_SIZE
+				&& this->z + dz >= 0 && this->z + dz < BOARD_SIZE) {
+			ptr_obj->translate(glm::vec3(0.1*dx, 0.0, 0.1*dz));
+			ptr_obj->BindBuffer();
+			this->x += dx; this->z += dz;
+		}
+	}
+	void translate(int z, int x) {
+		ptr_obj->translate(glm::vec3(0.1*x, 0.0, 0.1*z));
+	}
+	void drawPhongSurface() { ptr_obj->drawPhongSurface(); }
+	void drawWithShader(const GL2_ShaderProgram& shader) { ptr_obj->drawWithShader(shader); }
+	void applyLighting(const GL2_Light& light) { ptr_obj->applyLighting(light); }
+
+};
 class Chess {
 public:
+	bool is_user_turn = true;
+	Pointer* pointer;
 	Piece board[BOARD_SIZE][BOARD_SIZE]; // z by x
 
 	Chess() {
+		if (rand() % 2 == 0) is_user_turn = false;
+		else is_user_turn = true;
 		Chess::init();
+	}
+	void pointer_move(int& dx, int& dz) {
+		pointer->move(dx, dz);
 	}
 	void applyLighting(const GL2_Light& light) {
 		for (int z = 0; z < BOARD_SIZE; z++) {
@@ -339,6 +348,7 @@ public:
 					board[z][x].applyLighting(light);
 			}
 		}
+		pointer->applyLighting(light);
 	}
 	void drawBoardWithShader(const GL2_ShaderProgram& shader) {
 		for (int z = 0; z < BOARD_SIZE; z++) {
@@ -347,6 +357,7 @@ public:
 					board[z][x].drawWithShader(shader);
 			}
 		}
+		pointer->drawWithShader(shader);
 	}
 	void drawBoardWithPhongSurface() {
 		for (int z = 0; z < BOARD_SIZE; z++) {
@@ -355,9 +366,14 @@ public:
 					board[z][x].drawPhongSurface();
 			}
 		}
+		pointer->drawPhongSurface();
 	}
 	// Init Board
 	void Chess::init() {
+		if(is_user_turn)
+			pointer = new Pointer(0, 4);
+		else
+			pointer = new Pointer(3, 7);
 		board[0][0] = Piece(true, PC::Rook);
 		board[0][1] = Piece(true, PC::Knight);
 		board[0][2] = Piece(true, PC::Bishop);
