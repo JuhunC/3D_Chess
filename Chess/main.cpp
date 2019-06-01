@@ -117,7 +117,7 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		gl_obj[i] = (GL2_Object*)malloc(sizeof(GL2_Object)*BOARD_SIZE);
 		for (int j = 0; j < BOARD_SIZE; j++) {
-			if(i+j%2 ==0)
+			if((i+j)%2 ==0)
 				surface.readObj(board_file[4].c_str(), true, true);
 			else
 				surface.readObj(board_file[5].c_str(), true, true);
@@ -128,10 +128,10 @@ int main(int argc, char *argv[])
 			gl_obj[i][j] = GL2_Object();
 			gl_obj[i][j].initPhongSurface(surface);
 			if ((i + j) % 2 == 0) {
-				gl_obj[i][j].mat_.setBlue();
+				gl_obj[i][j].mat_.setBoard1();
 			}
 			else {
-				gl_obj[i][j].mat_.setRed();
+				gl_obj[i][j].mat_.setBoard2();
 			}
 		}
 	}

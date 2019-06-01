@@ -56,4 +56,18 @@ public:
 		emission_ = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
 		shininess_ = 83.2;
 	}
+	void setBoard1() {
+		ambient_ = glm::vec4(1.0f, 1.0f, 0.15f, 1.0f);
+		diffuse_ = glm::vec4(0.9f, 0.1f, 0.1f, 1.0f);
+		specular_ = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		emission_ = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		shininess_ = 5.0f;
+	}
+	void setBoard2() {
+		ambient_ = glm::vec4(1.0f, 1.0f, 0.15f, 1.0f);
+		diffuse_ = glm::vec4(1.0f, 0.8f, 0.8f, 1.0f);
+		specular_ = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		emission_ = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		shininess_ = 5.0f;
+	}
 };
