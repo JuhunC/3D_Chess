@@ -4,7 +4,19 @@
 #include "ConventionalMacros.h"
 #define BOARD_SIZE 8
 #define PIECE_NUM 16 // number of variety of pieces
-
+#define NOT_PIECE -1
+const std::string board_file[] = { "./images/chess_board_2_in.obj","./images/chess_board_2_out.obj",
+						"./images/chess_board_3_in.obj","./images/chess_board_3_out.obj",
+						"./images/chess_board_4_in.obj","./images/chess_board_4_out.obj"
+};
+const std::string piece_file[] = {
+						"./images/pieces/original/King_repaired.obj",
+						"./images/pieces/original/Queen_repaired.obj",
+						"./images/pieces/original/Bishop_repaired.obj",
+						"./images/pieces/original/Knight_repaired.obj",
+						"./images/pieces/original/Rook_repaired.obj",
+						"./images/pieces/original/Pawn_repaired.obj"
+};
 class obj {
 public:
 	const char* file = NULL;
@@ -20,9 +32,7 @@ public:
 	GL2_Material mat_;
 	OBJReader obj_reader;
 
-	obj() {
-		std::cout << 1 << std::endl;
-	}
+	obj() {}
 	obj(const char* file_loc) {
 		file = file_loc;
 		obj_reader.readObj(file);
@@ -53,6 +63,7 @@ public:
 			&obj_reader.ix_stack_[0], GL_STATIC_DRAW);
 	}
 	void translate(glm::vec3 t) {
+		std::cout << t.x << t.y<<t.z << std::endl;
 		for (int i = 0; i < obj_reader.pos_stack_.size(); i++) {
 			obj_reader.pos_stack_[i].x += t.x;
 			obj_reader.pos_stack_[i].y += t.y;
@@ -261,3 +272,119 @@ void mapPieces2Board(obj*** pc_obj, obj*** brd_pc_ptr) {
 		brd_pc_ptr[6][i] = pc_obj[1][8 + i];
 	}
 }
+enum PC {King, Queen, Bishop, Knight, Rook, Pawn};
+
+class Piece {
+	bool is_user;
+	int type;
+	PC type_;
+	obj* pc_obj;
+public:
+	Piece() {
+		is_user = false; type = NOT_PIECE; type_ = PC(1); pc_obj = nullptr;
+	}
+	Piece(bool is_user_, int type_) {
+		this->type = type_;
+		this->type_ = PC(type);
+		this->is_user = is_user_;
+		pc_obj = new obj(piece_file[type].c_str());
+		pc_obj->scale(0.1);
+		pc_obj->translate(glm::vec3(0, 0.05, 0));
+		pc_obj->BindBuffer();
+		if (is_user) pc_obj->mat_.setBlue();
+		else		 pc_obj->mat_.setGold();
+	}
+	Piece(bool is_user_, int type_, int x, int z) {
+		Piece(is_user_, type_);
+		pc_obj->translate(glm::vec3(0.1*x, 0, 0.1*z));
+	}
+	// TODO: Removal
+	void destroy() {}
+
+	// Object Related Functions
+	void drawPhongSurface() { pc_obj->drawPhongSurface(); }
+	void drawWithShader(const GL2_ShaderProgram& shader) { pc_obj->drawWithShader(shader); }
+	void applyLighting(const GL2_Light& light) { pc_obj->applyLighting(light); }
+	void translate(int x, int z) {
+		pc_obj->translate(glm::vec3(0.1f*x, 0, 0.1f*z));
+		pc_obj->updateBuffer();
+		pc_obj->BindBuffer();
+	}
+
+
+	int getZdirection() {
+		if (is_user) return 1;
+		else return -1;
+	}
+	
+	// Getter/Setter function
+	bool isUser() { return is_user; }
+	int getType() { return type; }
+	PC getPCType() { return type_; }
+	void setType(int type_) { this->type = type_; this->type_ = PC(type_); }
+	void setType(PC type_) { this->type_ = type_; this->type = PC(type_); }
+	obj* getObjPtr() { return pc_obj; }
+};
+class Chess {
+public:
+	Piece board[BOARD_SIZE][BOARD_SIZE]; // z by x
+
+	Chess() {
+		Chess::init();
+	}
+	void applyLighting(const GL2_Light& light) {
+		for (int z = 0; z < BOARD_SIZE; z++) {
+			for (int x = 0; x < BOARD_SIZE; x++) {
+				if(board[z][x].getType() != NOT_PIECE)
+					board[z][x].applyLighting(light);
+			}
+		}
+	}
+	void drawBoardWithShader(const GL2_ShaderProgram& shader) {
+		for (int z = 0; z < BOARD_SIZE; z++) {
+			for (int x = 0; x < BOARD_SIZE; x++) {
+				if (board[z][x].getType() != NOT_PIECE)
+					board[z][x].drawWithShader(shader);
+			}
+		}
+	}
+	void drawBoardWithPhongSurface() {
+		for (int z = 0; z < BOARD_SIZE; z++) {
+			for (int x = 0; x < BOARD_SIZE; x++) {
+				if (board[z][x].getType() != NOT_PIECE)
+					board[z][x].drawPhongSurface();
+			}
+		}
+	}
+	// Init Board
+	void Chess::init() {
+		board[0][0] = Piece(true, PC::Rook);
+		board[0][1] = Piece(true, PC::Knight);
+		board[0][2] = Piece(true, PC::Bishop);
+		board[0][3] = Piece(true, PC::King);
+		board[0][4] = Piece(true, PC::Queen);
+		board[0][5] = Piece(true, PC::Bishop);
+		board[0][6] = Piece(true, PC::Knight);
+		board[0][7] = Piece(true, PC::Rook);
+		for (int i = 0; i < BOARD_SIZE; i++) {
+			board[1][i] = Piece(true, PC::Pawn);
+		}
+		board[7][0] = Piece(false, PC::Rook);
+		board[7][1] = Piece(false, PC::Knight);
+		board[7][2] = Piece(false, PC::Bishop);
+		board[7][3] = Piece(false, PC::King);
+		board[7][4] = Piece(false, PC::Queen);
+		board[7][5] = Piece(false, PC::Bishop);
+		board[7][6] = Piece(false, PC::Knight);
+		board[7][7] = Piece(false, PC::Rook);
+		for (int i = 0; i < BOARD_SIZE; i++) {
+			board[6][i] = Piece(false, PC::Pawn);
+		}
+		for (int z = 0; z < BOARD_SIZE; z++) {
+			for (int x = 0; x < BOARD_SIZE; x++) {
+				if (board[z][x].getType() != NOT_PIECE)
+					board[z][x].translate(x, z);
+			}
+		}
+	}
+};

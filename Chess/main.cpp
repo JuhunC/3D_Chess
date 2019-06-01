@@ -27,18 +27,7 @@
 #define NUM_PARTICLES 1000
 int width_window = 640;
 int height_window = 480;
-const std::string board_file[] =  {"./images/chess_board_2_in.obj","./images/chess_board_2_out.obj",
-						"./images/chess_board_3_in.obj","./images/chess_board_3_out.obj",
-						"./images/chess_board_4_in.obj","./images/chess_board_4_out.obj"
-};
-const std::string piece_file[] = {
-						"./images/pieces/original/King_repaired.obj",
-						"./images/pieces/original/Queen_repaired.obj",
-						"./images/pieces/original/Bishop_repaired.obj",
-						"./images/pieces/original/Knight_repaired.obj",
-						"./images/pieces/original/Rook_repaired.obj",
-						"./images/pieces/original/Pawn_repaired.obj"
-};
+
 
 int board[8][8] = {
 	{5,4,5,4,5,4,5,4},
@@ -151,53 +140,53 @@ int main(int argc, char *argv[])
 	}
 
 	// Piece Object Setting
-	int tmp;
-	obj*** pc_obj = (obj***)malloc(sizeof(obj**)*2);
-	for (int i = 0; i < 2; i++) {
-		pc_obj[i] = (obj**)malloc(sizeof(obj*)*PIECE_NUM);
-		for (int j = 0; j < PIECE_NUM; j++) {
-			switch (j) {
-			case 0:
-				tmp = 0; break; // King
-			case 1:
-				tmp = 1; break; // Queen
-			case 2: case 3:
-				tmp = 2; break; // Bishop
-			case 4: case 5:
-				tmp = 3; break; // Knight
-			case 6: case 7:
-				tmp = 3; break; // Rook
-			default:
-				tmp = 5; break; // Pawn
-			}
-			pc_obj[i][j] = new obj(piece_file[tmp].c_str());
-			pc_obj[i][j]->scale(0.1);
-			pc_obj[i][j]->translate(glm::vec3(0, 0.05, 0));
-			pc_obj[i][j]->BindBuffer();
-			
-			
-			/*pc_obj[i][j].translate(glm::vec3(0.1*i, 0.0, 0.1*j));
-			pc_obj[i][j].updateBuffer();*/
-			/*surface.readObj(piece_file[tmp].c_str(), true, true);
-			surface.scale(0.1);
+	//int tmp;
+	//obj*** pc_obj = (obj***)malloc(sizeof(obj**)*2);
+	//for (int i = 0; i < 2; i++) {
+	//	pc_obj[i] = (obj**)malloc(sizeof(obj*)*PIECE_NUM);
+	//	for (int j = 0; j < PIECE_NUM; j++) {
+	//		switch (j) {
+	//		case 0:
+	//			tmp = 0; break; // King
+	//		case 1:
+	//			tmp = 1; break; // Queen
+	//		case 2: case 3:
+	//			tmp = 2; break; // Bishop
+	//		case 4: case 5:
+	//			tmp = 3; break; // Knight
+	//		case 6: case 7:
+	//			tmp = 3; break; // Rook
+	//		default:
+	//			tmp = 5; break; // Pawn
+	//		}
+	//		pc_obj[i][j] = new obj(piece_file[tmp].c_str());
+	//		pc_obj[i][j]->scale(0.1);
+	//		pc_obj[i][j]->translate(glm::vec3(0, 0.05, 0));
+	//		pc_obj[i][j]->BindBuffer();
+	//		
+	//		
+	//		/*pc_obj[i][j].translate(glm::vec3(0.1*i, 0.0, 0.1*j));
+	//		pc_obj[i][j].updateBuffer();*/
+	//		/*surface.readObj(piece_file[tmp].c_str(), true, true);
+	//		surface.scale(0.1);
 
-			surface.translate(TV(0.0, 0.05, 0.0));*/
-			
-			if (i == 0) {
-				pc_obj[i][j]->mat_.setGold();
-			}
-			else {
-				pc_obj[i][j]->mat_.setRed();
-			}
-			
-		}
-	}
+	//		surface.translate(TV(0.0, 0.05, 0.0));*/
+	//		
+	//		if (i == 0) {
+	//			pc_obj[i][j]->mat_.setGold();
+	//		}
+	//		else {
+	//			pc_obj[i][j]->mat_.setRed();
+	//		}
+	//		
+	//	}
+	//}
 	
 	//gl_obj.initPhongSurface(surface);
 	//gl_obj.mat_.setRed();
 	
 	// Board Pieces Pointer
-	obj*** brd_pc_ptr = (obj***)malloc(sizeof(obj**) * BOARD_SIZE);
+	/*obj*** brd_pc_ptr = (obj***)malloc(sizeof(obj**) * BOARD_SIZE);
 	for (int i = 0; i < BOARD_SIZE; i++) {
 		brd_pc_ptr[i] = (obj**)malloc(sizeof(obj*)*BOARD_SIZE);
 		for (int j = 0; j < BOARD_SIZE; j++) {
@@ -205,7 +194,7 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	mapPieces2Board(pc_obj, brd_pc_ptr);
+	mapPieces2Board(pc_obj, brd_pc_ptr);*/
 	/*obj ob1(piece_file[0].c_str());
 	ob1.BindBuffer();*/
 	//ob1.translate(glm::vec3(0.1, 0.0, 0.1));
@@ -219,7 +208,7 @@ int main(int argc, char *argv[])
 	glDisable(GL_COLOR_MATERIAL);
 
 	glLoadIdentity();
-
+	Chess my_chess;
 	GL2_Light light;
 
 	/* Loop until the user closes the window */
@@ -251,22 +240,23 @@ int main(int argc, char *argv[])
 		}
 
 		//ob1.applyLighting(light);
-		
-		for (int i = 0; i < BOARD_SIZE; i++) {
-			for (int j = 0; j < BOARD_SIZE; j++) {
-				if (brd_pc_ptr[i][j] != nullptr) {
-					brd_pc_ptr[i][j]->applyLighting(light);
-					//brd_pc_ptr[i][j]->updateBuffer();
-					brd_pc_ptr[i][j]->drawWithShader(gl_world.shaders_);
-				}
-				/*if (brd_pc_ptr[i][j] != nullptr) {
-				
-					
-					brd_pc_ptr[i][j]->applyLighting(light);
-					brd_pc_ptr[i][j]->drawWithShader(gl_world.shaders_);
-				}*/
-			}
-		}
+		my_chess.applyLighting(light);
+		my_chess.drawBoardWithShader(gl_world.shaders_);
+		//for (int i = 0; i < BOARD_SIZE; i++) {
+		//	for (int j = 0; j < BOARD_SIZE; j++) {
+		//		if (brd_pc_ptr[i][j] != nullptr) {
+		//			brd_pc_ptr[i][j]->applyLighting(light);
+		//			brd_pc_ptr[i][j]->updateBuffer();
+		//			brd_pc_ptr[i][j]->drawWithShader(gl_world.shaders_);
+		//		}
+		//		/*if (brd_pc_ptr[i][j] != nullptr) {
+		//		
+		//			
+		//			brd_pc_ptr[i][j]->applyLighting(light);
+		//			brd_pc_ptr[i][j]->drawWithShader(gl_world.shaders_);
+		//		}*/
+		//	}
+		//}
 		
 		//ob1.drawWithShader(gl_world.shaders_);
 		//gl_obj.applyLighting(light);
