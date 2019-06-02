@@ -252,8 +252,9 @@ class Piece {
 	PC type_;
 	obj* pc_obj;
 public:
+	int x, z; // board location
 	Piece() {
-		is_user = false; type = NOT_PIECE; type_ = PC(1); pc_obj = nullptr;
+		is_user = false; type = NOT_PIECE; pc_obj = nullptr;
 	}
 	Piece(bool is_user_, int type_) {
 		this->type = type_;
@@ -277,10 +278,12 @@ public:
 	void drawPhongSurface() { pc_obj->drawPhongSurface(); }
 	void drawWithShader(const GL2_ShaderProgram& shader) { pc_obj->drawWithShader(shader); }
 	void applyLighting(const GL2_Light& light) { pc_obj->applyLighting(light); }
-	void translate(int x, int z) {
-		pc_obj->translate(glm::vec3(0.1f*x, 0, 0.1f*z));
+	void translate(int dx, int dz) {
+		pc_obj->translate(glm::vec3(0.1f*dx, 0, 0.1f*dz));
 		pc_obj->updateBuffer();
 		pc_obj->BindBuffer();
+		this->x += dx;
+		this->z += dz;
 	}
 
 
@@ -297,10 +300,18 @@ public:
 	void setType(PC type_) { this->type_ = type_; this->type = PC(type_); }
 	obj* getObjPtr() { return pc_obj; }
 };
+Piece* board[BOARD_SIZE][BOARD_SIZE]; // z by x
 class Pointer {
 public:
 	int x, z;
 	obj* ptr_obj;
+	Piece* bind_piece= nullptr;
+	int prior_x, prior_z;
+	bool is_binded() {
+		if (bind_piece == nullptr)
+			return false;
+		else return true;
+	}
 	Pointer(int z, int x) {
 		this->x = x;
 		this->z = z;
@@ -311,17 +322,36 @@ public:
 		ptr_obj->BindBuffer();
 		ptr_obj->mat_.setPointer();
 	}
+	void bind(Piece* piece_ptr) {	
+		if (bind_piece == nullptr) {
+			bind_piece = piece_ptr;
+			prior_x = bind_piece->x;
+			prior_z = bind_piece->z;
+			std::cout << "Binded" << std::endl;
+		}
+	}
+	void unbind() {
+		if (board[bind_piece->z][bind_piece->x]->getType() == NOT_PIECE) {
+			std::swap(board[prior_z][prior_x], board[bind_piece->z][bind_piece->x]);
+			std::cout << "Unbinded" << std::endl;
+			bind_piece = nullptr;
+		}
+	}
 	void move(int dx, int dz) {
 		if (this->x + dx >= 0 && this->x + dx < BOARD_SIZE
 				&& this->z + dz >= 0 && this->z + dz < BOARD_SIZE) {
 			ptr_obj->translate(glm::vec3(0.1*dx, 0.0, 0.1*dz));
 			ptr_obj->BindBuffer();
 			this->x += dx; this->z += dz;
+			
+			if (bind_piece != nullptr) {
+				bind_piece->translate(dx,dz);
+			}
 		}
-	}
+	}/*
 	void translate(int z, int x) {
 		ptr_obj->translate(glm::vec3(0.1*x, 0.0, 0.1*z));
-	}
+	}*/
 	void drawPhongSurface() { ptr_obj->drawPhongSurface(); }
 	void drawWithShader(const GL2_ShaderProgram& shader) { ptr_obj->drawWithShader(shader); }
 	void applyLighting(const GL2_Light& light) { ptr_obj->applyLighting(light); }
@@ -331,7 +361,6 @@ class Chess {
 public:
 	bool is_user_turn = true;
 	Pointer* pointer;
-	Piece board[BOARD_SIZE][BOARD_SIZE]; // z by x
 
 	Chess() {
 		if (rand() % 2 == 0) is_user_turn = false;
@@ -344,8 +373,8 @@ public:
 	void applyLighting(const GL2_Light& light) {
 		for (int z = 0; z < BOARD_SIZE; z++) {
 			for (int x = 0; x < BOARD_SIZE; x++) {
-				if(board[z][x].getType() != NOT_PIECE)
-					board[z][x].applyLighting(light);
+				if(board[z][x]->getType() != NOT_PIECE)
+					board[z][x]->applyLighting(light);
 			}
 		}
 		pointer->applyLighting(light);
@@ -353,8 +382,8 @@ public:
 	void drawBoardWithShader(const GL2_ShaderProgram& shader) {
 		for (int z = 0; z < BOARD_SIZE; z++) {
 			for (int x = 0; x < BOARD_SIZE; x++) {
-				if (board[z][x].getType() != NOT_PIECE)
-					board[z][x].drawWithShader(shader);
+				if (board[z][x]->getType() != NOT_PIECE)
+					board[z][x]->drawWithShader(shader);
 			}
 		}
 		pointer->drawWithShader(shader);
@@ -362,44 +391,61 @@ public:
 	void drawBoardWithPhongSurface() {
 		for (int z = 0; z < BOARD_SIZE; z++) {
 			for (int x = 0; x < BOARD_SIZE; x++) {
-				if (board[z][x].getType() != NOT_PIECE)
-					board[z][x].drawPhongSurface();
+				if (board[z][x]->getType() != NOT_PIECE)
+					board[z][x]->drawPhongSurface();
 			}
 		}
 		pointer->drawPhongSurface();
 	}
+	void enter() {
+		std::cout << "Enter Pressed" << std::endl;
+		if (pointer->is_binded() == true) {
+			pointer->unbind();
+		}
+		else if (pointer->is_binded() == false){
+			if (board[pointer->z][pointer->x]->getType() != NOT_PIECE) {
+				std::cout << pointer->x << pointer->z << std::endl;
+				pointer->bind(board[pointer->z][pointer->x]);
+			}
+		}
+	}
 	// Init Board
 	void Chess::init() {
+		for (int i = 0; i < BOARD_SIZE; i++) {
+			for (int j = 0; j < BOARD_SIZE; j++) {
+				board[i][j] = new Piece();
+			}
+		}
 		if(is_user_turn)
 			pointer = new Pointer(0, 4);
 		else
 			pointer = new Pointer(3, 7);
-		board[0][0] = Piece(true, PC::Rook);
-		board[0][1] = Piece(true, PC::Knight);
-		board[0][2] = Piece(true, PC::Bishop);
-		board[0][3] = Piece(true, PC::King);
-		board[0][4] = Piece(true, PC::Queen);
-		board[0][5] = Piece(true, PC::Bishop);
-		board[0][6] = Piece(true, PC::Knight);
-		board[0][7] = Piece(true, PC::Rook);
+		board[0][0] = new Piece(true, PC::Rook);
+		board[0][1] = new Piece(true, PC::Knight);
+		board[0][2] = new Piece(true, PC::Bishop);
+		board[0][3] = new Piece(true, PC::King);
+		board[0][4] = new Piece(true, PC::Queen);
+		board[0][5] = new Piece(true, PC::Bishop);
+		board[0][6] = new Piece(true, PC::Knight);
+		board[0][7] = new Piece(true, PC::Rook);
 		for (int i = 0; i < BOARD_SIZE; i++) {
-			board[1][i] = Piece(true, PC::Pawn);
+			board[1][i] = new Piece(true, PC::Pawn);
 		}
-		board[7][0] = Piece(false, PC::Rook);
-		board[7][1] = Piece(false, PC::Knight);
-		board[7][2] = Piece(false, PC::Bishop);
-		board[7][3] = Piece(false, PC::King);
-		board[7][4] = Piece(false, PC::Queen);
-		board[7][5] = Piece(false, PC::Bishop);
-		board[7][6] = Piece(false, PC::Knight);
-		board[7][7] = Piece(false, PC::Rook);
+		board[7][0] = new Piece(false, PC::Rook);
+		board[7][1] = new Piece(false, PC::Knight);
+		board[7][2] = new Piece(false, PC::Bishop);
+		board[7][3] = new Piece(false, PC::King);
+		board[7][4] = new Piece(false, PC::Queen);
+		board[7][5] = new Piece(false, PC::Bishop);
+		board[7][6] = new Piece(false, PC::Knight);
+		board[7][7] = new Piece(false, PC::Rook);
 		for (int i = 0; i < BOARD_SIZE; i++) {
-			board[6][i] = Piece(false, PC::Pawn);
+			board[6][i] = new Piece(false, PC::Pawn);
 		}
 		for (int z = 0; z < BOARD_SIZE; z++) {
 			for (int x = 0; x < BOARD_SIZE; x++) {
-				if (board[z][x].getType() != NOT_PIECE)
-					board[z][x].translate(x, z);
+				if (board[z][x]->getType() != NOT_PIECE)
+					board[z][x]->translate(x, z);
 			}
 		}
 	}

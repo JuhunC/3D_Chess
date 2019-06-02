@@ -29,7 +29,7 @@ int width_window = 640;
 int height_window = 480;
 
 int ptr_dx=0, ptr_dz = 0;
-
+bool enter_pressed = false;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
 		ptr_dz = 1;
@@ -41,6 +41,9 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
 		ptr_dx = -1;
+	}
+	else if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
+		enter_pressed = true;
 	}
 }
 
@@ -176,6 +179,12 @@ int main(int argc, char *argv[])
 		// Check Pointer Movement
 		my_chess.pointer_move(ptr_dx, ptr_dz);
 		ptr_dx = 0; ptr_dz = 0;
+		
+		// ENTER check
+		if (enter_pressed == true) {
+			my_chess.enter();
+			enter_pressed = false;
+		}
 
 		// Draw Chess Pieces
 		my_chess.applyLighting(light);
