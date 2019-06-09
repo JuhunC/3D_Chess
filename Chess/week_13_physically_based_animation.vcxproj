@@ -131,7 +131,6 @@
     <ClCompile Include="Math\Quaternion.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="callback.h" />
     <ClInclude Include="chess.h" />
     <ClInclude Include="Geometry\Box3D.h" />
     <ClInclude Include="Geometry\TriangularSurface\ObjFileReader.h" />
@@ -139,8 +138,11 @@
     <ClInclude Include="Geometry\TriangularSurface\StaticTriangularSurface.h" />
     <ClInclude Include="GL2\GL2_ShaderProgram.h" />
     <ClInclude Include="GL2\GL_VIEW.h" />
+    <ClInclude Include="include_path.h" />
     <ClInclude Include="Math\Quaternion.h" />
+    <ClInclude Include="obj.h" />
     <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="Piece.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

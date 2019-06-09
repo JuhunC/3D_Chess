@@ -42,7 +42,6 @@ public:
 	{
 		reset();
 	}
-
 	void StartMouseRotation(int x, int y);
 	void StartMouseDolly(int x, int y);
 	void StartMousePan(int x, int y);

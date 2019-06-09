@@ -65,10 +65,16 @@
     <ClInclude Include="ParticleSystem.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="callback.h">
+    <ClInclude Include="chess.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="chess.h">
+    <ClInclude Include="obj.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include_path.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Piece.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

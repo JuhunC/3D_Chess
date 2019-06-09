@@ -191,7 +191,6 @@ const glm::mat4 GL_VIEW::GetScreenViewMatrix() const
 	// glm::vec3(0.0f, 0.0f, -1.0f) is a default back step vector
 	return projection_ * glm::translate(glm::vec3(0.0f, 0.0f, -1.0f)) *glm::mat4_cast(rot_);
 }
-
 void GL_VIEW::SetProjection(const float fov, const float aspect, const float zNear, const float zFar)
 {
 	projection_ = glm::perspective(fov, aspect, zNear, zFar);	// radian? degree?

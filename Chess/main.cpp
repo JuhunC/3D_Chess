@@ -1,52 +1,7 @@
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <GL/GLU.h>
-#include <GL/freeglut.h>
-#include <cstring>
-#include <stdlib.h>		  // srand, rand
-#include <thread>         // std::this_thread::sleep_for
-#include <chrono>         // std::chrono::seconds
-#include <iostream>
-#include "math.h"
-#include <vector>
-#include <fstream>
-#include <string>
-#include <sstream>
-#include <glm/gtc/quaternion.hpp> 
-#include <glm/gtx/quaternion.hpp>
-#include "Geometry/TriangularSurface/StaticTriangularSurface.h"
-#include "GL2/GL2_Object.h"
-#include "GL2/GL2_World.h"
-#include "GL2/GL2_Light.h"
-#include "GL2/GL2_Material.h"
-#include "ParticleSystem.h"
-#include "callback.h"
-#include "chess.h"
-#include "ObjReader.h"
-
+#include"chess.h"
 #define NUM_PARTICLES 1000
 int width_window = 640;
 int height_window = 480;
-
-int ptr_dx=0, ptr_dz = 0;
-bool enter_pressed = false;
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-		ptr_dz = 1;
-	}else if(key == GLFW_KEY_DOWN && action == GLFW_PRESS){
-		ptr_dz = -1;
-	}
-	else if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-		ptr_dx = 1;
-	}
-	else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-		ptr_dx = -1;
-	}
-	else if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
-		enter_pressed = true;
-	}
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -98,10 +53,15 @@ int main(int argc, char *argv[])
 	const float aspect = (float)width / (float)height;
 	glViewport(0, 0, width, height);
 	glOrtho(-1.2*aspect, 1.2*aspect, -1.2, 1.2, -100.0, 100.0);
-	gluLookAt(0.1, 0.1, 0.1, 0.0, 0.0, 0.0, 0, 1, 0);//camera takes care of it
+	//gluLookAt(0.1, 0.1, 0.1, 0.0, 0.0, 0.0, 0, 1, 0);//camera takes care of it
+	//		eye x,y,z	center x,y,z	up x,y,z)
 
-	const float zNear = 0.001, zFar = 100.0, fov = 45.0;			// UI
-	gl_world.camera_.Resize(width, height, fov, zNear, zFar);
+	changeTurn(true, width, height);
+	//const float zNear = 0.001, zFar = 100.0, fov = 45.0;			// UI
+	//gl_world.camera_.Resize(width, height, fov, zNear, zFar);
+	//
+	//gl_world.camera_.projection_ *= glm::translate(glm::vec3(-0.35f, -0.7f, +0.0f));
+	//gl_world.camera_.projection_ *= glm::rotate(0.6f, glm::vec3(1.0f,0.0f,0.0f));
 	gl_world.initShaders();
 
 	//	glEnable(GL_MULTISAMPLE);
@@ -149,6 +109,7 @@ int main(int argc, char *argv[])
 
 	glLoadIdentity();
 	Chess my_chess;
+	my_chess.pointer->reset(7,3, false);
 	GL2_Light light;
 
 	/* Loop until the user closes the window */
@@ -227,7 +188,7 @@ int main(int argc, char *argv[])
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
-
+		//printMat4(gl_world.camera_.GetWorldViewMatrix());
 		/* Poll for and process events */
 		glfwPollEvents();
 
