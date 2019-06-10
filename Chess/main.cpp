@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 		return -1;
 	}
 
-	glClearColor(0, 0, 0, 1); // white background
+	glClearColor(0,0,0, 1); // white background
 
 	printf("%s\n", glGetString(GL_VERSION));
 
@@ -53,13 +53,12 @@ int main(int argc, char *argv[])
 	const float aspect = (float)width / (float)height;
 	glViewport(0, 0, width, height);
 	glOrtho(-1.2*aspect, 1.2*aspect, -1.2, 1.2, -100.0, 100.0);
-	//gluLookAt(0.1, 0.1, 0.1, 0.0, 0.0, 0.0, 0, 1, 0);//camera takes care of it
-	//		eye x,y,z	center x,y,z	up x,y,z)
 
-	changeTurn(true, width, height);
-	//const float zNear = 0.001, zFar = 100.0, fov = 45.0;			// UI
-	//gl_world.camera_.Resize(width, height, fov, zNear, zFar);
-	//
+	gluLookAt(10, 10, 10, 3.5, 0, 3.5, 0, 1, 0);//camera takes care of it
+	//		eye x,y,z	center x,y,z	up x,y,z)
+	const float zNear = 0.001, zFar = 100.0, fov = 45.0;			// UI
+	gl_world.camera_.Resize(width, height, fov, zNear, zFar);
+	gl_world.camera_.translate(3.5, 3, 20);
 	//gl_world.camera_.projection_ *= glm::translate(glm::vec3(-0.35f, -0.7f, +0.0f));
 	//gl_world.camera_.projection_ *= glm::rotate(0.6f, glm::vec3(1.0f,0.0f,0.0f));
 	gl_world.initShaders();
@@ -84,9 +83,9 @@ int main(int argc, char *argv[])
 				surface.readObj(board_file[4].c_str(), true, true);
 			else
 				surface.readObj(board_file[5].c_str(), true, true);
-			surface.scale(0.1);
+			//surface.scale(0.1);
 			
-			surface.translate(TV(0.1*i, 0.0, 0.1*j));
+			surface.translate(TV(1.0*i, 0.0, 1.0*j));
 			
 			gl_obj[i][j] = GL2_Object();
 			gl_obj[i][j].initPhongSurface(surface);
@@ -111,7 +110,7 @@ int main(int argc, char *argv[])
 	Chess my_chess;
 	my_chess.pointer->reset(7,3, false);
 	GL2_Light light;
-
+	changeTurn_VIEW(my_chess.pointer->is_user(), width, height);
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
@@ -188,7 +187,7 @@ int main(int argc, char *argv[])
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
-		//printMat4(gl_world.camera_.GetWorldViewMatrix());
+		printMat4(gl_world.camera_.GetWorldViewMatrix());
 		/* Poll for and process events */
 		glfwPollEvents();
 

@@ -44,35 +44,30 @@ const std::string piece_file[] = {
 						"./images/pieces/original/Pawn_repaired.obj"
 };
 enum PC { King, Queen, Bishop, Knight, Rook, Pawn };
-float Scale[] = { 0.15,	0.15,	0.13,	0.13,	0.13,	0.1 };
-float trans_up[] = { 0.08,	0.08,	0.07,	0.07,	0.07,	0.05 };
+float Scale[] = { 1.3,	1.3,	1.13,	1.13,	1.13,	1.1 };
+float trans_up[] = { 0.7,	0.7,	0.6,	0.6,	0.6,	0.5 };
 
-void printMat4(glm::mat4 mat) {
-	for (int i = 0; i < mat.length(); i++) {
-		for (int j = 0; j < mat[i].length(); j++) {
-			std::cout << mat[i][j] << "\t";
-		}
-		std::cout << std::endl;
-	}
-}
+int getUserVec(bool isuser); // get direction by the user
+void setUserViewPoint(int&width, int&height);					// reset VIEW to USER
+void setPCViewPoint(int&width, int&height);						// reset VIEW to PC
+void changeTurn_VIEW(bool is_user, int& width, int& height);	// change VIEW by turn
+
+void printMat4(glm::mat4 mat); // print mat to console
+
+// callbacks
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
+void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+
 void setUserViewPoint(int& width, int& height) {
-
-	const float zNear = 0.001, zFar = 100.0, fov = 45.0;			// UI
-	gl_world.camera_.Resize(width, height, fov, zNear, zFar);
-
-	gl_world.camera_.projection_ *= glm::translate(glm::vec3(-0.35f, -0.7f, +0.0f));
-	gl_world.camera_.projection_ *= glm::rotate(0.6f, glm::vec3(1.0f, 0.0f, 0.0f));
-	gl_world.initShaders();
+	gl_world.camera_.USR_VIEW();
 }
 void setPCViewPoint(int& width, int& height) {
-	const float zNear = 0.001, zFar = 100.0, fov = 45.0;			// UI
-	gl_world.camera_.Resize(width, height, fov, zNear, zFar);
-
-	gl_world.camera_.projection_ *= glm::translate(glm::vec3(-0.35f, -0.7f, +0.0f));
-	gl_world.camera_.projection_ *= glm::rotate(0.6f, glm::vec3(1.0f, 0.0f, 0.0f));
-	gl_world.initShaders();
+	gl_world.camera_.USR_VIEW();
 }
-void changeTurn(bool is_user, int& width, int& height) {
+void changeTurn_VIEW(bool is_user, int& width, int& height) {
 	if (is_user) {
 		setUserViewPoint(width, height);
 	}
@@ -80,11 +75,11 @@ void changeTurn(bool is_user, int& width, int& height) {
 		setPCViewPoint(width, height);
 	}
 }
+
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	gl_world.camera_.UpdateDolly(yoffset);
 }
-
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
@@ -116,14 +111,12 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 		gl_world.camera_.EndMousePan(xpos, ypos);
 	}
 }
-
 void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	//std::cout << xpos << " " << ypos << std::endl;
 
 	gl_world.camera_.ProcessMouseMotion(xpos, ypos);
 }
-
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	int vec = 1.0;
 	if (!world_is_user) vec *= -1.0;
@@ -141,5 +134,18 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	}
 	else if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
 		enter_pressed = true;
+	}
+}
+
+int getUserVec(bool isuser) {
+	if (isuser) return 1;
+	else return -1;
+}
+void printMat4(glm::mat4 mat) {
+	for (int i = 0; i < mat.length(); i++) {
+		for (int j = 0; j < mat[i].length(); j++) {
+			std::cout << mat[i][j] << "\t";
+		}
+		std::cout << std::endl;
 	}
 }

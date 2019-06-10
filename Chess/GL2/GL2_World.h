@@ -22,7 +22,7 @@ public:
 		camera_.SetDollyStartPosition(-1.5f);
 		camera_.SetDollyScale(0.1f);
 		camera_.SetTrackballScale(0.1f);
-		camera_.SetCenterOfRotation(glm::vec3(0, 0, 0));
+		camera_.SetCenterOfRotation(glm::vec3(3.5, 0, 3.5));
 
 		//initShaders(); // do this after glfw is initialized
 	}

@@ -29,4 +29,28 @@ public:
 	void setType(PC type_) { this->type_ = type_; this->type = PC(type_); }
 	obj* getObjPtr() { return pc_obj; }
 };
-Piece* board[BOARD_SIZE][BOARD_SIZE]; // z by x
+Piece::Piece() { // default not a piece
+	is_user = false; type = NOT_PIECE; pc_obj = nullptr;
+}
+Piece::Piece(bool is_user_, int type_) { // set piece
+	this->type = type_;
+	this->type_ = PC(type);
+	this->is_user = is_user_;
+	pc_obj = new obj(piece_file[type].c_str());
+	pc_obj->scale(Scale[type]);
+	pc_obj->translate(glm::vec3(0, trans_up[type], 0));
+	pc_obj->BindBuffer();
+	if (is_user) pc_obj->mat_.setBlue();
+	else		 pc_obj->mat_.setGold();
+}
+Piece::Piece(bool is_user_, int type_, int x, int z) {
+	Piece(is_user_, type_);
+	pc_obj->translate(glm::vec3(1.0*x, 0, 1.0*z));
+}
+void Piece::translate(int dx, int dz) {
+	pc_obj->translate(glm::vec3(1.0f*dx, 0, 1.0f*dz));
+	pc_obj->updateBuffer();
+	pc_obj->BindBuffer();
+	this->x += dx;
+	this->z += dz;
+}

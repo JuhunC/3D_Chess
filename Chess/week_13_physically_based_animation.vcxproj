@@ -143,6 +143,7 @@
     <ClInclude Include="obj.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Piece.h" />
+    <ClInclude Include="Pointer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

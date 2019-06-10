@@ -42,6 +42,9 @@ public:
 	{
 		reset();
 	}
+	void translate(int x, int y, int z);
+	void USR_VIEW();
+	void PC_VIEW();
 	void StartMouseRotation(int x, int y);
 	void StartMouseDolly(int x, int y);
 	void StartMousePan(int x, int y);

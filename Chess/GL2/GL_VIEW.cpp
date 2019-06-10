@@ -8,11 +8,11 @@ for Introduction to Computer Graphics, 2017 Spring
 
 void GL_VIEW::reset()
 {
-	rot_ = rot_incr_ = glm::angleAxis(glm::degrees(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	rot_ = rot_incr_ = glm::angleAxis(glm::degrees(0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
 	trackball_scale_ = 1.0f;
 	dolly_scale_ = 0.01f;
-	pan_scale_ = 0.01f;
+	pan_scale_ = 0.01f;// 0.01f;
 }
 
 void GL_VIEW::Resize(const int width, const int height, const float fov, const float znear, const float zfar)
@@ -68,7 +68,22 @@ void GL_VIEW::EndMouseDolly(int x, int y)
 	is_dolly_active_ = false;
 	dx_ = dy_ = 0;
 }
-
+void GL_VIEW::translate(int x, int y, int z) {
+	reset();
+	glm::vec3 v = glm::vec3(-100*x, -100*y, -100*z);
+	pan_ = v * pan_scale_;
+	
+}
+void GL_VIEW::USR_VIEW() {
+	translate(3.5, 2, 13);
+	rot_ = glm::angleAxis(0.3f, glm::vec3(1.0f, 0.0f, 0.0f)) *rot_;
+}
+void GL_VIEW::PC_VIEW() {
+	translate(3.5, 2, 13);
+	rot_ = glm::angleAxis(3.14f, glm::vec3(0.0f, 1.0f, 0.0f))*rot_;
+	rot_ = glm::angleAxis(0.3f, glm::vec3(1.0f, 0.0f, 0.0f)) *rot_;
+	
+}
 void GL_VIEW::StartMousePan(int x, int y)
 {
 	is_pan_active_ = true;
