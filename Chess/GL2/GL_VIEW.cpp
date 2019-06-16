@@ -76,12 +76,13 @@ void GL_VIEW::translate(int x, int y, int z) {
 }
 void GL_VIEW::USR_VIEW() {
 	translate(3.5, 2, 13);
+	rot_ = glm::angleAxis(3.14f, glm::vec3(0.0f, 1.0f, 0.0f))*rot_;
 	rot_ = glm::angleAxis(0.3f, glm::vec3(1.0f, 0.0f, 0.0f)) *rot_;
 }
 void GL_VIEW::PC_VIEW() {
 	translate(3.5, 2, 13);
-	rot_ = glm::angleAxis(3.14f, glm::vec3(0.0f, 1.0f, 0.0f))*rot_;
 	rot_ = glm::angleAxis(0.3f, glm::vec3(1.0f, 0.0f, 0.0f)) *rot_;
+	
 	
 }
 void GL_VIEW::StartMousePan(int x, int y)

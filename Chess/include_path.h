@@ -28,6 +28,7 @@ bool world_is_user;
 GL2_World gl_world;
 int ptr_dx = 0, ptr_dz = 0;
 bool enter_pressed = false;
+bool cancel_action = false;
 #define BOARD_SIZE 8
 #define PIECE_NUM 16 // number of variety of pieces
 #define NOT_PIECE -1
@@ -48,9 +49,9 @@ float Scale[] = { 1.3,	1.3,	1.13,	1.13,	1.13,	1.1 };
 float trans_up[] = { 0.7,	0.7,	0.6,	0.6,	0.6,	0.5 };
 
 int getUserVec(bool isuser); // get direction by the user
-void setUserViewPoint(int&width, int&height);					// reset VIEW to USER
-void setPCViewPoint(int&width, int&height);						// reset VIEW to PC
-void changeTurn_VIEW(bool is_user, int& width, int& height);	// change VIEW by turn
+void setUserViewPoint();					// reset VIEW to USER
+void setPCViewPoint();						// reset VIEW to PC
+void changeTurn_VIEW(bool is_user);	// change VIEW by turn
 
 void printMat4(glm::mat4 mat); // print mat to console
 
@@ -61,18 +62,18 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 
-void setUserViewPoint(int& width, int& height) {
+void setUserViewPoint() {
 	gl_world.camera_.USR_VIEW();
 }
-void setPCViewPoint(int& width, int& height) {
-	gl_world.camera_.USR_VIEW();
+void setPCViewPoint() {
+	gl_world.camera_.PC_VIEW();
 }
-void changeTurn_VIEW(bool is_user, int& width, int& height) {
+void changeTurn_VIEW(bool is_user) {
 	if (is_user) {
-		setUserViewPoint(width, height);
+		setUserViewPoint();
 	}
 	else {
-		setPCViewPoint(width, height);
+		setPCViewPoint();
 	}
 }
 
@@ -118,8 +119,7 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
 	gl_world.camera_.ProcessMouseMotion(xpos, ypos);
 }
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	int vec = 1.0;
-	if (!world_is_user) vec *= -1.0;
+	int vec = getUserVec(world_is_user);
 	if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
 		ptr_dz = 1 * vec;
 	}
@@ -135,10 +135,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	else if (key == GLFW_KEY_ENTER && action == GLFW_PRESS) {
 		enter_pressed = true;
 	}
+	else if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+		std::cout << "ESC" << std::endl;
+		cancel_action = true;
+	}
 }
 
 int getUserVec(bool isuser) {
-	if (isuser) return 1;
+	if (isuser == true) return 1;
 	else return -1;
 }
 void printMat4(glm::mat4 mat) {
@@ -148,4 +152,12 @@ void printMat4(glm::mat4 mat) {
 		}
 		std::cout << std::endl;
 	}
+}
+int min(int x, int z) {
+	if (x > z) return z;
+	else return x;
+}
+int max(int x, int z) {
+	if (x > z) return x;
+	else return z;
 }

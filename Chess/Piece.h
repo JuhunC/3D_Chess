@@ -2,11 +2,13 @@
 #include"include_path.h"
 #include"obj.h"
 class Piece {
+	
 	bool is_user;
 	int type;
 	PC type_;
 	obj* pc_obj;
 public:
+	bool first_move = false;
 	int x, z; // board location
 	Piece(); //default no piece location
 	Piece(bool is_user_, int type_); // piece without location

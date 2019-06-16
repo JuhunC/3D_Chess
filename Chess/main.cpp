@@ -3,6 +3,7 @@
 int width_window = 640;
 int height_window = 480;
 
+GL2_Object** board_init(StaticTriangularSurface& surface);
 int main(int argc, char *argv[])
 {
 	GLFWwindow *window = nullptr;
@@ -59,8 +60,6 @@ int main(int argc, char *argv[])
 	const float zNear = 0.001, zFar = 100.0, fov = 45.0;			// UI
 	gl_world.camera_.Resize(width, height, fov, zNear, zFar);
 	gl_world.camera_.translate(3.5, 3, 20);
-	//gl_world.camera_.projection_ *= glm::translate(glm::vec3(-0.35f, -0.7f, +0.0f));
-	//gl_world.camera_.projection_ *= glm::rotate(0.6f, glm::vec3(1.0f,0.0f,0.0f));
 	gl_world.initShaders();
 
 	//	glEnable(GL_MULTISAMPLE);
@@ -72,31 +71,9 @@ int main(int argc, char *argv[])
 
 
 	StaticTriangularSurface surface;
-
 	
 	// Board Object Setting
-	GL2_Object** gl_obj=(GL2_Object**)malloc(sizeof(GL2_Object*)*BOARD_SIZE);
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		gl_obj[i] = (GL2_Object*)malloc(sizeof(GL2_Object)*BOARD_SIZE);
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			if((i+j)%2 ==0)
-				surface.readObj(board_file[4].c_str(), true, true);
-			else
-				surface.readObj(board_file[5].c_str(), true, true);
-			//surface.scale(0.1);
-			
-			surface.translate(TV(1.0*i, 0.0, 1.0*j));
-			
-			gl_obj[i][j] = GL2_Object();
-			gl_obj[i][j].initPhongSurface(surface);
-			if ((i + j) % 2 == 0) {
-				gl_obj[i][j].mat_.setBoard1();
-			}
-			else {
-				gl_obj[i][j].mat_.setBoard2();
-			}
-		}
-	}
+	GL2_Object** gl_obj = board_init(surface);
 
 	// depth test
 	glEnable(GL_DEPTH_TEST);
@@ -107,13 +84,21 @@ int main(int argc, char *argv[])
 	glDisable(GL_COLOR_MATERIAL);
 
 	glLoadIdentity();
+	world_is_user = true;
 	Chess my_chess;
-	my_chess.pointer->reset(7,3, false);
+	//my_chess.pointer->reset(7,3, true);
 	GL2_Light light;
-	changeTurn_VIEW(my_chess.pointer->is_user(), width, height);
+	changeTurn_VIEW(true);
 	/* Loop until the user closes the window */
 	while (!glfwWindowShouldClose(window))
 	{
+		/*if (my_chess.pointer->is_user()) { std::cout << "User Turn" << std::endl; }
+		else std::cout << "PC Turn" << std::endl;*/
+		// ESC cancel selection
+		if (cancel_action == true) {
+			my_chess.pointer->cancel_action();
+			cancel_action = false;
+		}
 		gl_world.camera_.ContinueRotation();
 
 		glm::mat4 vp = gl_world.camera_.GetWorldViewMatrix();
@@ -187,7 +172,7 @@ int main(int argc, char *argv[])
 
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
-		printMat4(gl_world.camera_.GetWorldViewMatrix());
+		//printMat4(gl_world.camera_.GetWorldViewMatrix());
 		/* Poll for and process events */
 		glfwPollEvents();
 
@@ -199,3 +184,29 @@ int main(int argc, char *argv[])
 	return 0;
 }
 
+
+GL2_Object** board_init(StaticTriangularSurface& surface) {
+	GL2_Object** gl_obj = (GL2_Object**)malloc(sizeof(GL2_Object*)*BOARD_SIZE);
+	for (int i = 0; i < BOARD_SIZE; i++) {
+		gl_obj[i] = (GL2_Object*)malloc(sizeof(GL2_Object)*BOARD_SIZE);
+		for (int j = 0; j < BOARD_SIZE; j++) {
+			if ((i + j) % 2 == 0)
+				surface.readObj(board_file[4].c_str(), true, true);
+			else
+				surface.readObj(board_file[5].c_str(), true, true);
+			//surface.scale(0.1);
+
+			surface.translate(TV(1.0*i, 0.0, 1.0*j));
+
+			gl_obj[i][j] = GL2_Object();
+			gl_obj[i][j].initPhongSurface(surface);
+			if ((i + j) % 2 == 0) {
+				gl_obj[i][j].mat_.setBoard1();
+			}
+			else {
+				gl_obj[i][j].mat_.setBoard2();
+			}
+		}
+	}
+	return gl_obj;
+}

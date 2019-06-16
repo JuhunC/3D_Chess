@@ -48,28 +48,6 @@ void Chess::enter() {
 	else {
 		pointer->try_bind();
 	}
-	//Piece* ptr_piece = board[pointer->z][pointer->x];
-	//std::cout << "Enter Pressed" << std::endl;
-	//if (pointer->is_binded() == true) {
-	//	if (ptr_piece->getType() == NOT_PIECE) { // exchange to an empty space
-	//		pointer->unbind();
-	//	}
-	//	else if (pointer->bind_piece->isUser() != ptr_piece->isUser()) {
-	//		pointer->unbind();
-	//		//free(board[pointer->z][pointer->x]);
-	//	}
-	//	else if (pointer->prior_x == pointer->x
-	//		&& pointer->prior_z == pointer->z) {
-	//		pointer->unbind();
-	//	}
-	//}
-	//else if (pointer->is_binded() == false) {
-	//	if (ptr_piece->getType() != NOT_PIECE
-	//		&& ptr_piece->isUser() == pointer->is_user()) {
-	//		std::cout << pointer->x << pointer->z << std::endl;
-	//		pointer->bind(ptr_piece);
-	//	}
-	//}
 }
 // Init Board
 void Chess::init() {
@@ -78,7 +56,7 @@ void Chess::init() {
 			board[i][j] = nullptr;
 		}
 	}
-	if (rand()%2==1) {
+	if (world_is_user) {
 		pointer = new Pointer(0, 4, true);
 	}
 	else {
