@@ -80,5 +80,8 @@
     <ClInclude Include="Pointer.h">
       <Filter>Resource Files</Filter>
     </ClInclude>
+    <ClInclude Include="BMPImage.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

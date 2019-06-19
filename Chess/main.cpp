@@ -12,14 +12,14 @@ int main(int argc, char *argv[])
 	if (!glfwInit()) return -1;
 
 	glfwWindowHint(GLFW_SAMPLES, 32);
-
+	
 	// window resolution
 	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 	width_window = mode->width * 0.8f;
 	height_window = mode->height * 0.8f;
 
 	/* Create a windowed mode window and its OpenGL context */
-	window = glfwCreateWindow(width_window, height_window, "Hello World", NULL, NULL);
+	window = glfwCreateWindow(width_window, height_window, "Chess World", NULL, NULL);
 
 	if (!window) {
 		glfwTerminate();
@@ -68,7 +68,13 @@ int main(int argc, char *argv[])
 	ParticleSystem ps;
 	ps.initParticleSystem(NUM_PARTICLES);
 
-
+	obj stadium("./images/stadium.obj");
+	stadium.rotate(180.0, glm::vec3(0, 1, 0));
+	stadium.scale(30.0);
+	stadium.translate(glm::vec3(3.0, 3.0, 3.0));
+	//stadium.setTexture("./images/1.bmp");
+	stadium.BindBuffer();
+	
 
 	StaticTriangularSurface surface;
 	
@@ -109,10 +115,16 @@ int main(int argc, char *argv[])
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+		//stadium.updatePhongSurfaceWithTexture(surface);
+
 		glUseProgram(gl_world.shaders_.program_id_);
-
+		
+		//stadium.prepareTexture();
 		gl_world.shaders_.sendUniform(vp, "mvp");
-
+		stadium.applyLighting(light);
+		//stadium.drawWithShaderAndTexture(gl_world.shaders_);
+		stadium.drawWithShader(gl_world.shaders_);
+		
 		//gl_obj.drawPhongSurface();
 		for (int i = 0; i < BOARD_SIZE; i++) {
 			for (int j = 0; j < BOARD_SIZE; j++) {
@@ -146,8 +158,6 @@ int main(int argc, char *argv[])
 		// draw particles
 		// old version
 		
-		//ob1.updateBuffer();
-		
 		for (int p = 0; p < ps.particles.size(); p++) {
 			const TV red = TV(1.0f, 0.0f, 0.0f);
 			const TV blue = TV(0.0f, 1.0f, 0.0f);
@@ -167,9 +177,6 @@ int main(int argc, char *argv[])
 		}
 		
 		
-
-
-
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 		//printMat4(gl_world.camera_.GetWorldViewMatrix());

@@ -1,10 +1,11 @@
 #pragma once
 #include"include_path.h"
-
+#include"BMPImage.h"
 class obj {
 public:
 	const char* file = NULL;
 	GLuint vbo[3];
+	GLuint textures[2]; // image over the obj
 	float mat_ambient[4] = { 0.1745f, 0.01175f, 0.01175f, 0.55f };
 	float mat_diffuse[4] = { 0.61424f, 0.04136f, 0.04136f, 0.55f };
 	float mat_specular[4] = { 0.727811f, 0.626959f, 0.626959f, 0.55f };
@@ -13,6 +14,7 @@ public:
 	glm::vec4 light_product_diffuse_ = glm::vec4(1.0f, 0.1f, 0.1f, 1.0f);
 	glm::vec4 light_product_specular_ = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 	float mat_shininess_ = 5.0;
+	int num_elements_ = 0;
 	GL2_Material mat_;
 	OBJReader obj_reader;
 
@@ -29,6 +31,41 @@ public:
 	}
 	void set_mat_specular(float a, float b, float c, float d) {
 		mat_specular[0] = a; mat_specular[1] = b; mat_specular[2] = c; mat_specular[3] = d;
+	}
+	void updatePhongSurfaceWithTexture(const StaticTriangularSurface& surface)
+	{
+		num_elements_ = surface.triangles_.num_elements_ * 3;
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		glBufferData(GL_ARRAY_BUFFER, surface.vertex_positions_.num_elements_ * sizeof(float) * 3, surface.vertex_positions_.values_, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+		glBufferData(GL_ARRAY_BUFFER, surface.vertex_normals_.num_elements_ * sizeof(float) * 3, surface.vertex_normals_.values_, GL_STATIC_DRAW);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
+		glBufferData(GL_ARRAY_BUFFER, surface.vertex_uv_.num_elements_ * sizeof(float) * 2, surface.vertex_uv_.values_, GL_STATIC_DRAW);
+
+		Array1D<Vector3D<unsigned int> > tri_ix;
+		surface.getUnsignedIntTriangles(tri_ix);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, tri_ix.num_elements_ * sizeof(unsigned int) * 3,
+			surface.triangles_.values_, GL_STATIC_DRAW);
+	}
+	void setTexture(const char* image_dir) {
+		glGenTextures(2, textures);
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, textures[0]);
+
+		int texture_width, texture_height;
+		unsigned char *rgb_array = nullptr;
+		readBMP24(image_dir, &texture_width, &texture_height, &rgb_array);
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, texture_width, texture_height, 0, GL_RGB, GL_UNSIGNED_BYTE, rgb_array);
+		// do not forget these options!
+		// https://www.khronos.org/registry/OpenGL-Refpages/gl4/html/glTexParameter.xhtml
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
 	void BindBuffer() {
 		glGenBuffers(3, vbo);
@@ -82,6 +119,66 @@ public:
 
 		glDisableClientState(GL_COLOR_ARRAY);
 		glDisableClientState(GL_VERTEX_ARRAY);
+	}
+	void prepareTexture() {
+		GLint loc = glGetUniformLocation(gl_world.shaders_.program_id_, "my_texture");
+		if (loc != -1)
+		{
+			glUniform1i(loc, 0); // 0 is the index of our first texture
+		}
+	}
+	void drawWithShaderAndTexture(const GL2_ShaderProgram& program)
+	{
+		//glUseProgram(shader_programme);	// activate your shader!
+
+		//TODO: use one 'lightproduct' uniform for amb, dif, and spe.
+		program.sendUniform(light_position_, "light_position");
+		program.sendUniform(light_product_ambient_, "light_product_ambient");
+		program.sendUniform(light_product_diffuse_, "light_product_diffuse");
+		program.sendUniform(light_product_specular_, "light_product_specular");
+		program.sendUniform(mat_shininess_, "mat_shininess");
+
+		// draw here
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+		glEnableVertexAttribArray(0);
+		glVertexAttribPointer
+		(
+			0,                  // attribute 0
+			3,                  // size (x, y, z)
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+		glEnableVertexAttribArray(1);
+		glVertexAttribPointer
+		(
+			1,                  // attribute 1
+			3,                  // size (nx, ny, nz)
+			GL_FLOAT,           // type
+			GL_FALSE,           // normalized?
+			0,                  // stride
+			(void*)0            // array buffer offset
+		);
+
+		glBindBuffer(GL_ARRAY_BUFFER, vbo[2]);
+		glEnableVertexAttribArray(2);
+		glVertexAttribPointer
+		(
+			2,					// attribute 2
+			2,					// size (u, v)
+			GL_FLOAT,			// type
+			GL_FALSE,			// normalized?
+			0,					// stride
+			(void*)0			// array buffer offset
+		);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[3]);
+		glLineWidth(1);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		glDrawElements(GL_TRIANGLES, num_elements_, GL_UNSIGNED_INT, 0);
 	}
 	void drawWithShader(const GL2_ShaderProgram& program)
 	{
@@ -181,13 +278,12 @@ public:
 		glNormalPointer(GL_FLOAT, 0, 0);
 
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[2]);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glDrawElements(GL_TRIANGLES, obj_reader.ix_stack_.size() * 3, GL_UNSIGNED_INT, 0);
+		glPolygonMode(GL_FRONT, GL_LINE);
+		glDrawElements(GL_TRIANGLES, num_elements_, GL_UNSIGNED_INT, 0);
 
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 	}
-
 	void applyLighting(const GL2_Light& light)
 	{
 		light_product_ambient_ = light.ambient_ * mat_.ambient_ + mat_.emission_;
