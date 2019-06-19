@@ -90,7 +90,7 @@ Pointer::Pointer(int z, int x, bool is_user) {
 	this->z = z;
 	ptr_obj = new obj("./images/Pointer.obj");
 	ptr_obj->scale(0.8);
-	//ptr_obj->rotate(4, glm::vec3(1, 0, 0));
+	ptr_obj->rotate(4, glm::vec3(1, 0, 0));
 	ptr_obj->translate(glm::vec3(1.0f*this->x, 2 ,1.0f*this->z));
 	ptr_obj->BindBuffer();
 	ptr_obj->mat_.setPointer();
@@ -99,8 +99,7 @@ Pointer::Pointer(int z, int x, bool is_user) {
 }
 void Pointer::reset(int z, int x, bool is_user) {
 	ptr_obj->translate(glm::vec3(-1.0f*this->x, 0, -1.0f*this->z));
-
-	ptr_obj->rotate(180, glm::vec3(0, 1, 0));
+	ptr_obj->rotate(180, glm::vec3(0, 0, 1));
 	this->x = x;
 	this->z = z;
 	ptr_obj->translate(glm::vec3(1.0f*this->x, 0, 1.0f*this->z));
@@ -110,6 +109,10 @@ void Pointer::reset(int z, int x, bool is_user) {
 	world_is_user = is_user;
 }
 void Pointer::change_turn() {
+	ptr_obj->translate(glm::vec3(-1.0f*this->x, 0, -1.0f*this->z));
+	ptr_obj->rotate(180, glm::vec3(0, 1, 0));
+	ptr_obj->translate(glm::vec3(1.0f*this->x, 0, 1.0f*this->z));
+	ptr_obj->BindBuffer();
 	*user = !*user;
 	if (*user) { std::cout << "User Turn" << std::endl; }
 	else std::cout << "PC Turn" << std::endl;
