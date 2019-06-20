@@ -1,20 +1,31 @@
 #pragma once
 #include"include_path.h"
 #include"obj.h"
+
 class Piece {
-	
 	bool is_user;
 	int type;
 	PC type_;
 	obj* pc_obj;
 public:
-	bool first_move = false;
+	
+	bool destroyed = false;
+	bool first_move = true;
 	int x, z; // board location
 	Piece(); //default no piece location
 	Piece(bool is_user_, int type_); // piece without location
 	Piece(bool is_user_, int type_, int x, int z); // piece with location
-	// TODO: Removal
-	void destroy() {}
+	void update() {
+		if (destroyed == true) {
+			pc_obj->translate(glm::vec3(0, -0.01f, 0));
+			pc_obj->BindBuffer();
+		}
+	}
+	/// TODO: Removal
+	Piece* destroy() {
+		destroyed = true;
+		return this;
+	}
 
 	// Object Related Functions
 	void drawPhongSurface() { pc_obj->drawPhongSurface(); }
@@ -56,3 +67,5 @@ void Piece::translate(int dx, int dz) {
 	this->x += dx;
 	this->z += dz;
 }
+std::vector<Piece*> dest_pieces;
+int dest_num;

@@ -6,7 +6,7 @@ int height_window = 480;
 GL2_Object** board_init(StaticTriangularSurface& surface);
 int main(int argc, char *argv[])
 {
-	GLFWwindow *window = nullptr;
+	
 
 	/* Initialize the library */
 	if (!glfwInit()) return -1;
@@ -88,7 +88,8 @@ int main(int argc, char *argv[])
 	glEnable(GL_NORMALIZE);
 	glShadeModel(GL_SMOOTH);
 	glDisable(GL_COLOR_MATERIAL);
-
+	dest_pieces = std::vector<Piece*>(16);
+	dest_num = 0;
 	glLoadIdentity();
 	world_is_user = true;
 	Chess my_chess;
@@ -96,6 +97,7 @@ int main(int argc, char *argv[])
 	GL2_Light light;
 	changeTurn_VIEW(true);
 	/* Loop until the user closes the window */
+	int end_wait_count=0;
 	while (!glfwWindowShouldClose(window))
 	{
 		/*if (my_chess.pointer->is_user()) { std::cout << "User Turn" << std::endl; }
@@ -131,6 +133,12 @@ int main(int argc, char *argv[])
 				gl_obj[i][j].applyLighting(light);
 				gl_obj[i][j].drawWithShader(gl_world.shaders_);
 			}
+		}
+		for (int i = 0; i < dest_num; i++) {
+			std::cout << i << std::endl;
+			(dest_pieces)[i]->update();
+			(dest_pieces)[i]->applyLighting(light);
+			(dest_pieces)[i]->drawWithShader(gl_world.shaders_);
 		}
 
 		// Check Pointer Movement
@@ -175,14 +183,29 @@ int main(int argc, char *argv[])
 			glVertex3fv(ps.particles[p].pos.values_);
 			glEnd();
 		}
-		
-		
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 		//printMat4(gl_world.camera_.GetWorldViewMatrix());
 		/* Poll for and process events */
 		glfwPollEvents();
-
+		if (global_game_over == false && isGameOver() == GAME_OVER_USER_WON) {
+			global_game_over = true;
+			destroySelect(false);
+		}
+		else if (global_game_over ==false && isGameOver() == GAME_OVER_PC_WON) {
+			global_game_over = true;
+			destroySelect(true);
+		}
+		
+		if (global_game_over == true) {
+			end_wait_count++;
+			std::cout << end_wait_count << std::endl;
+			if (end_wait_count == 300) {
+				break;
+			}
+		}
+		
+		
 		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
@@ -190,6 +213,8 @@ int main(int argc, char *argv[])
 
 	return 0;
 }
+
+
 
 
 GL2_Object** board_init(StaticTriangularSurface& surface) {

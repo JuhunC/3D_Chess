@@ -11,7 +11,7 @@ void GL_VIEW::reset()
 	rot_ = rot_incr_ = glm::angleAxis(glm::degrees(0.0f), glm::vec3(0.0f, -1.0f, 0.0f));
 
 	trackball_scale_ = 1.0f;
-	dolly_scale_ = 0.01f;
+	dolly_scale_ = 0.1f;
 	pan_scale_ = 0.01f;// 0.01f;
 }
 

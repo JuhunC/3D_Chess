@@ -26,12 +26,19 @@
 
 bool world_is_user;
 GL2_World gl_world;
+GLFWwindow *window = nullptr;
 int ptr_dx = 0, ptr_dz = 0;
 bool enter_pressed = false;
 bool cancel_action = false;
+bool global_game_over = false;
 #define BOARD_SIZE 8
 #define PIECE_NUM 16 // number of variety of pieces
 #define NOT_PIECE -1
+#define GAME_ERROR -1
+#define GAME_NOT_OVER 1
+#define GAME_OVER_USER_WON 2
+#define GAME_OVER_PC_WON 3
+
 const std::string board_file[] = { "./images/chess_board_2_in.obj","./images/chess_board_2_out.obj",
 						"./images/chess_board_3_in.obj","./images/chess_board_3_out.obj",
 						"./images/chess_board_4_in.obj","./images/chess_board_4_out.obj"
