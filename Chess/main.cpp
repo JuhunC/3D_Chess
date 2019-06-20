@@ -98,6 +98,8 @@ int main(int argc, char *argv[])
 	changeTurn_VIEW(true);
 	/* Loop until the user closes the window */
 	int end_wait_count=0;
+	PlaySound("./sound/stadium_sound.wav", NULL, SND_LOOP | SND_ASYNC); 
+	waveOutSetVolume(0, VOLUME_LOW);
 	while (!glfwWindowShouldClose(window))
 	{
 		/*if (my_chess.pointer->is_user()) { std::cout << "User Turn" << std::endl; }
@@ -135,7 +137,6 @@ int main(int argc, char *argv[])
 			}
 		}
 		for (int i = 0; i < dest_num; i++) {
-			std::cout << i << std::endl;
 			(dest_pieces)[i]->update();
 			(dest_pieces)[i]->applyLighting(light);
 			(dest_pieces)[i]->drawWithShader(gl_world.shaders_);
@@ -166,7 +167,7 @@ int main(int argc, char *argv[])
 		// draw particles
 		// old version
 		
-		for (int p = 0; p < ps.particles.size(); p++) {
+		/*for (int p = 0; p < ps.particles.size(); p++) {
 			const TV red = TV(1.0f, 0.0f, 0.0f);
 			const TV blue = TV(0.0f, 1.0f, 0.0f);
 			
@@ -182,7 +183,7 @@ int main(int argc, char *argv[])
 			glColor3fv(blend_color.values_);
 			glVertex3fv(ps.particles[p].pos.values_);
 			glEnd();
-		}
+		}*/
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
 		//printMat4(gl_world.camera_.GetWorldViewMatrix());
@@ -199,7 +200,6 @@ int main(int argc, char *argv[])
 		
 		if (global_game_over == true) {
 			end_wait_count++;
-			std::cout << end_wait_count << std::endl;
 			if (end_wait_count == 300) {
 				break;
 			}

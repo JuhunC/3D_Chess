@@ -13,6 +13,11 @@
 #include <fstream>
 #include <string>
 #include <sstream>
+// sound lib
+#include <Windows.h>
+#include <mmsystem.h>
+#include<mciapi.h>
+
 #include <glm/gtc/quaternion.hpp> 
 #include <glm/gtx/quaternion.hpp>
 #include "Geometry/TriangularSurface/StaticTriangularSurface.h"
@@ -23,7 +28,7 @@
 #include "ParticleSystem.h"
 #include "ObjReader.h"
 #include "ConventionalMacros.h"
-
+#pragma comment(lib, "Winmm.lib")
 bool world_is_user;
 GL2_World gl_world;
 GLFWwindow *window = nullptr;
@@ -38,6 +43,12 @@ bool global_game_over = false;
 #define GAME_NOT_OVER 1
 #define GAME_OVER_USER_WON 2
 #define GAME_OVER_PC_WON 3
+#define VOLUME_OFF 0
+#define VOLUME_LOW 858993459
+#define VOLUME_NORMAL 1717986918
+#define VOLUME_MEDIUM -1717986919
+#define VOLUME_HIGH -858993460
+#define VOLUME_VERY_HIGH -1
 
 const std::string board_file[] = { "./images/chess_board_2_in.obj","./images/chess_board_2_out.obj",
 						"./images/chess_board_3_in.obj","./images/chess_board_3_out.obj",

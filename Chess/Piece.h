@@ -10,18 +10,26 @@ class Piece {
 public:
 	
 	bool destroyed = false;
+	int destroy_cnt = 0;
 	bool first_move = true;
 	int x, z; // board location
 	Piece(); //default no piece location
 	Piece(bool is_user_, int type_); // piece without location
 	Piece(bool is_user_, int type_, int x, int z); // piece with location
 	void update() {
-		if (destroyed == true) {
+		if (destroyed == true && destroy_cnt < 130) {
 			pc_obj->translate(glm::vec3(0, -0.01f, 0));
 			pc_obj->BindBuffer();
+			destroy_cnt++;
+		}
+		else {
+			if (destroyed == true) {
+				free(pc_obj);
+				destroyed = false;
+			}
 		}
 	}
-	/// TODO: Removal
+	// Removal
 	Piece* destroy() {
 		destroyed = true;
 		return this;
