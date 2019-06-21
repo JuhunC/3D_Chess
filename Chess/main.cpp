@@ -6,7 +6,20 @@ int height_window = 480;
 GL2_Object** board_init(StaticTriangularSurface& surface);
 int main(int argc, char *argv[])
 {
-	
+	std::cout << "CHOOSE CHESS MODE\n1. Original Mode : Press 1\n2. Animal Chess Mode : Press 2" << std::endl;
+	int option;
+	std::cin >> option;
+	switch (option) {
+	case 1:
+		is_animal = false;
+		break;
+	case 2:
+		is_animal = true;
+		break;
+	default:
+		std::cout << "Wrong Option!!" << std::endl;
+		exit(-1);
+	}
 
 	/* Initialize the library */
 	if (!glfwInit()) return -1;

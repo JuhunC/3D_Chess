@@ -36,6 +36,7 @@ int ptr_dx = 0, ptr_dz = 0;
 bool enter_pressed = false;
 bool cancel_action = false;
 bool global_game_over = false;
+
 #define BOARD_SIZE 8
 #define PIECE_NUM 16 // number of variety of pieces
 #define NOT_PIECE -1
@@ -49,7 +50,7 @@ bool global_game_over = false;
 #define VOLUME_MEDIUM -1717986919
 #define VOLUME_HIGH -858993460
 #define VOLUME_VERY_HIGH -1
-
+bool is_animal = false;
 const std::string board_file[] = { "./images/chess_board_2_in.obj","./images/chess_board_2_out.obj",
 						"./images/chess_board_3_in.obj","./images/chess_board_3_out.obj",
 						"./images/chess_board_4_in.obj","./images/chess_board_4_out.obj"
@@ -62,9 +63,21 @@ const std::string piece_file[] = {
 						"./images/pieces/original/Rook_repaired.obj",
 						"./images/pieces/original/Pawn_repaired.obj"
 };
+const std::string piece_file_animal[] = {
+						"./images/pieces/Chess_-_Lion_King_1.obj",
+						"./images/pieces/Chess_-_Lioness_Queen.obj",
+						"./images/pieces/Chess_-_Seal_Bishop.obj",
+						"./images/pieces/Chess_-_Horse_1.obj",
+						"./images/pieces/Chess_-_Poodle_Rook.obj",
+						"./images/pieces/Chess_-_Penguin_Pawn_1.obj"
+};
 enum PC { King, Queen, Bishop, Knight, Rook, Pawn };
 float Scale[] = { 1.3,	1.3,	1.13,	1.13,	1.13,	1.1 };
 float trans_up[] = { 0.7,	0.7,	0.6,	0.6,	0.6,	0.5 };
+
+float Scale_animal[] = { 4.0,	3.0,	1.5,	1.13,	2.0,	1.1 };
+float trans_up_animal[] = { 0.7,	0.7,	0.6,	0.6,	0.6,	0.5 };
+float trans_front_animal[] = { 1.7, 1.7, 0.4, 0.1, 0.7, 0 };
 
 int getUserVec(bool isuser); // get direction by the user
 void setUserViewPoint();					// reset VIEW to USER

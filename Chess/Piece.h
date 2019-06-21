@@ -57,9 +57,31 @@ Piece::Piece(bool is_user_, int type_) { // set piece
 	this->type = type_;
 	this->type_ = PC(type);
 	this->is_user = is_user_;
-	pc_obj = new obj(piece_file[type].c_str());
-	pc_obj->scale(Scale[type]);
-	pc_obj->translate(glm::vec3(0, trans_up[type], 0));
+	if (is_animal == false) {
+		pc_obj = new obj(piece_file[type].c_str());
+	}
+	else if (is_animal == true) {
+		pc_obj = new obj(piece_file_animal[type].c_str());
+	}
+	if (is_animal == false) {
+		pc_obj->scale(Scale[type]);
+		pc_obj->translate(glm::vec3(0, trans_up[type], 0));
+	}
+	else if (is_animal == true) {
+		if (this->is_user == false)
+			pc_obj->rotate(180, glm::vec3(0, 1, 0));
+		pc_obj->scale(Scale_animal[type]);
+		if (this->is_user == false) {
+			pc_obj->translate(glm::vec3(0, trans_up_animal[type], 0));
+			pc_obj->translate(glm::vec3(0, 0, -1 * trans_front_animal[type]));
+		}
+		else {
+			pc_obj->translate(glm::vec3(0, trans_up_animal[type], 0));
+			pc_obj->translate(glm::vec3(0, 0, trans_front_animal[type]));
+		}
+		
+	}
+	
 	pc_obj->BindBuffer();
 	if (is_user) pc_obj->mat_.setBlue();
 	else		 pc_obj->mat_.setGold();
