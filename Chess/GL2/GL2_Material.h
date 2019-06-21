@@ -23,6 +23,20 @@ public:
 	~GL2_Material()
 	{
 	}
+	void setField() {
+		ambient_ = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+		diffuse_ = glm::vec4(1.0f, 0.5f, 0.0f, 1.0f);
+		specular_ = glm::vec4(0.6f, 0.7f, 0.6f, 1.0f);
+		emission_ = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		shininess_ = 4.0f;
+	}
+	void setGreen() {
+		ambient_ = glm::vec4(0.0f, 0.3f, 0.0f, 1.0f);
+		diffuse_ = glm::vec4(0.0f, 0.7f, 0.0f, 1.0f);
+		specular_ = glm::vec4(0.2, 0.2, 0.2, 1.0);
+		emission_ = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+		shininess_ = 5.0;
+	}
 	void setBlue()
 	{
 		ambient_ = glm::vec4(0.15f, 0.15f, 0.15f, 1.0f);

@@ -25,11 +25,11 @@ public: // f(x) = (x^2-xc)^2 + (y^2-yc)^2 + (z^2-zc)^2 -r^2
 class ParticleSystem {
 public:
 	std::vector<Particle> particles;
-	Sphere obj;
+	//Sphere obj;
 	
-	void initParticleSystem(const int num_particle) {
-		obj.center = TV(0.5, 0.5, 0.5);
-		obj.radius = 0.3;
+	void initParticleSystem(const int num_particle, const float& z, const float& x) {
+		//obj.center = TV(z,x, 0.5);
+		//obj.radius = 0.3;
 
 
 		particles.resize(num_particle);
@@ -39,9 +39,12 @@ public:
 			TV& vel(particles[p].vel);
 			float& m = particles[p].mass;
 
-			pos.x_ = (float)rand() / (float)RAND_MAX; // [0,1)
-			pos.y_ = (float)rand() / (float)RAND_MAX + 0.9; // [0,1)
-			pos.z_ = (float)rand() / (float)RAND_MAX; // [0,1)
+			pos.x_ = x;
+			pos.y_ = 0;
+			pos.z_ = z;
+			//pos.x_ = (float)rand() / (float)RAND_MAX; // [0,1)
+			//pos.y_ = (float)rand() / (float)RAND_MAX + 0.9; // [0,1)
+			//pos.z_ = (float)rand() / (float)RAND_MAX; // [0,1)
 			m = (float)rand() / (float)RAND_MAX *10;
 
 
@@ -94,24 +97,24 @@ public:
 
 
 		// object collision
-		const float frac = 0.3;
+		//const float frac = 0.3;
 
-		for (int p = 0; p < particles.size(); p++) {
-			TV& pos(particles[p].pos);
-			TV& vel(particles[p].vel);
+		//for (int p = 0; p < particles.size(); p++) {
+		//	TV& pos(particles[p].pos);
+		//	TV& vel(particles[p].vel);
 
-			// collision
-			if (obj.getSignedDistance(pos) <= 0.0f) {
-				const TV normal = obj.getNormal(pos);
-				const float v_dot_norm = dotProduct(vel, normal);
+		//	// collision
+		//	if (obj.getSignedDistance(pos) <= 0.0f) {
+		//		const TV normal = obj.getNormal(pos);
+		//		const float v_dot_norm = dotProduct(vel, normal);
 
-				if (v_dot_norm < 0.0f) { // collision occured
-					const TV v_n = v_dot_norm * normal;
-					const TV v_t = vel - v_n;
+		//		if (v_dot_norm < 0.0f) { // collision occured
+		//			const TV v_n = v_dot_norm * normal;
+		//			const TV v_t = vel - v_n;
 
-					vel = v_t* frac + (-coef)*v_n;
-				}
-			}
-		}
+		//			vel = v_t* frac + (-coef)*v_n;
+		//		}
+		//	}
+		//}
 	}
 };

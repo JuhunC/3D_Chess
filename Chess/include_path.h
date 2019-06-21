@@ -77,7 +77,7 @@ float trans_up[] = { 0.7,	0.7,	0.6,	0.6,	0.6,	0.5 };
 
 float Scale_animal[] = { 4.0,	3.0,	1.5,	1.13,	2.0,	1.1 };
 float trans_up_animal[] = { 0.7,	0.7,	0.6,	0.6,	0.6,	0.5 };
-float trans_front_animal[] = { 1.7, 1.7, 0.4, 0.1, 0.7, 0 };
+float trans_front_animal[] = { 1.7, 1.3, 0.4, 0.1, 0.7, 0 };
 
 int getUserVec(bool isuser); // get direction by the user
 void setUserViewPoint();					// reset VIEW to USER

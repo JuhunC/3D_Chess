@@ -79,12 +79,26 @@ int main(int argc, char *argv[])
 
 	// particle system init
 	ParticleSystem ps;
-	ps.initParticleSystem(NUM_PARTICLES);
+	ps.initParticleSystem(NUM_PARTICLES, 1.0f,1.0f);
 
-	obj stadium("./images/stadium.obj");
-	stadium.rotate(180.0, glm::vec3(0, 1, 0));
-	stadium.scale(30.0);
-	stadium.translate(glm::vec3(3.0, 3.0, 3.0));
+	obj stadium;
+	if (is_animal == false) {
+		stadium = obj("./images/stadium.obj");
+		stadium.rotate(180.0, glm::vec3(0, 1, 0));
+		stadium.scale(30.0);
+		stadium.translate(glm::vec3(3.0, 3.0, 3.0));
+		stadium.mat_.setGreen();
+	}
+	else {
+		stadium = obj("./images/Farm.obj");
+		stadium.rotate(90.0, glm::vec3(0, 1, 0));
+		stadium.scale(30.0);
+		stadium.translate(glm::vec3(5.0, 0.0,0.0));
+		stadium.translate(glm::vec3(0, 10, 0.0));
+		stadium.translate(glm::vec3(0,0,0));
+		stadium.mat_.setField();
+	}
+	
 	//stadium.setTexture("./images/1.bmp");
 	stadium.BindBuffer();
 	
@@ -111,7 +125,9 @@ int main(int argc, char *argv[])
 	changeTurn_VIEW(true);
 	/* Loop until the user closes the window */
 	int end_wait_count=0;
-	PlaySound("./sound/stadium_sound.wav", NULL, SND_LOOP | SND_ASYNC); 
+	if(is_animal ==false)
+		PlaySound("./sound/stadium_sound.wav", NULL, SND_LOOP | SND_ASYNC); 
+	else PlaySound("./sound/farm_sound.wav", NULL, SND_LOOP | SND_ASYNC);
 	waveOutSetVolume(0, VOLUME_LOW);
 	while (!glfwWindowShouldClose(window))
 	{
