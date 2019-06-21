@@ -1,8 +1,12 @@
 #include"chess.h"
-#define NUM_PARTICLES 1000
+
 int width_window = 640;
 int height_window = 480;
-
+void playBackgroundSound() {
+	if (is_animal == false)
+		PlaySound("./sound/stadium_sound.wav", NULL, SND_LOOP | SND_ASYNC);
+	else PlaySound("./sound/farm_sound.wav", NULL, SND_LOOP | SND_ASYNC);
+}
 GL2_Object** board_init(StaticTriangularSurface& surface);
 int main(int argc, char *argv[])
 {
@@ -78,8 +82,8 @@ int main(int argc, char *argv[])
 	//	glEnable(GL_MULTISAMPLE);
 
 	// particle system init
-	ParticleSystem ps;
-	ps.initParticleSystem(NUM_PARTICLES, 1.0f,1.0f);
+	/*ParticleSystem ps;
+	ps.initParticleSystem(NUM_PARTICLES, 1.0,1.0,1.0);*/
 
 	obj stadium;
 	if (is_animal == false) {
@@ -125,14 +129,10 @@ int main(int argc, char *argv[])
 	changeTurn_VIEW(true);
 	/* Loop until the user closes the window */
 	int end_wait_count=0;
-	if(is_animal ==false)
-		PlaySound("./sound/stadium_sound.wav", NULL, SND_LOOP | SND_ASYNC); 
-	else PlaySound("./sound/farm_sound.wav", NULL, SND_LOOP | SND_ASYNC);
+	std::thread background_sound_thr(playBackgroundSound);
 	waveOutSetVolume(0, VOLUME_LOW);
 	while (!glfwWindowShouldClose(window))
 	{
-		/*if (my_chess.pointer->is_user()) { std::cout << "User Turn" << std::endl; }
-		else std::cout << "PC Turn" << std::endl;*/
 		// ESC cancel selection
 		if (cancel_action == true) {
 			my_chess.pointer->cancel_action();
@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 		glm::mat4 vp = gl_world.camera_.GetWorldViewMatrix();
 
 		// update particle system
-		ps.advanceOneTimeStep(0.001);
+		//ps.advanceOneTimeStep(0.001);
 
 		/* Render here */
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -195,23 +195,23 @@ int main(int argc, char *argv[])
 
 		// draw particles
 		// old version
-		
 		/*for (int p = 0; p < ps.particles.size(); p++) {
 			const TV red = TV(1.0f, 0.0f, 0.0f);
 			const TV blue = TV(0.0f, 1.0f, 0.0f);
-			
+
 			TV& pos(ps.particles[p].pos);
 			TV& vel(ps.particles[p].vel);
+			if (vel.getMagnitude() > 1) {
+				const float alpha = vel.getMagnitude() * 0.5;
 
-			const float alpha = vel.getMagnitude() * 0.5;
+				const TV blend_color = alpha * red + (1 - alpha) * blue;
 
-			const TV blend_color = alpha * red + (1 - alpha) * blue;
-			
-			glPointSize(ps.particles[p].mass);
-			glBegin(GL_POINTS);
-			glColor3fv(blend_color.values_);
-			glVertex3fv(ps.particles[p].pos.values_);
-			glEnd();
+				glPointSize(ps.particles[p].mass * 1);
+				glBegin(GL_POINTS);
+				glColor3fv(blend_color.values_);
+				glVertex3fv(ps.particles[p].pos.values_);
+				glEnd();
+			}
 		}*/
 		/* Swap front and back buffers */
 		glfwSwapBuffers(window);
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 		
 		//std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
-
+	background_sound_thr.~thread();
 	glfwTerminate();
 
 	return 0;

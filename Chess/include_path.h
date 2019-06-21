@@ -18,6 +18,7 @@
 #include <mmsystem.h>
 #include<mciapi.h>
 
+#include<thread>
 #include <glm/gtc/quaternion.hpp> 
 #include <glm/gtx/quaternion.hpp>
 #include "Geometry/TriangularSurface/StaticTriangularSurface.h"
@@ -29,6 +30,16 @@
 #include "ObjReader.h"
 #include "ConventionalMacros.h"
 #pragma comment(lib, "Winmm.lib")
+
+bool is_animal = false;
+
+void playDyingSound() {
+	PlaySound("./sound/pacman_dying_sound.wav", NULL, NULL);
+	if (is_animal == false)
+		PlaySound("./sound/stadium_sound.wav", NULL, SND_LOOP | SND_ASYNC);
+	else PlaySound("./sound/farm_sound.wav", NULL, SND_LOOP | SND_ASYNC);
+}
+
 bool world_is_user;
 GL2_World gl_world;
 GLFWwindow *window = nullptr;
@@ -50,7 +61,8 @@ bool global_game_over = false;
 #define VOLUME_MEDIUM -1717986919
 #define VOLUME_HIGH -858993460
 #define VOLUME_VERY_HIGH -1
-bool is_animal = false;
+#define NUM_PARTICLES 100
+
 const std::string board_file[] = { "./images/chess_board_2_in.obj","./images/chess_board_2_out.obj",
 						"./images/chess_board_3_in.obj","./images/chess_board_3_out.obj",
 						"./images/chess_board_4_in.obj","./images/chess_board_4_out.obj"

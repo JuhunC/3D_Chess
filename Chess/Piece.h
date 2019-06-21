@@ -7,6 +7,8 @@ class Piece {
 	int type;
 	PC type_;
 	obj* pc_obj;
+	ParticleSystem ps;
+	
 public:
 	
 	bool destroyed = false;
@@ -17,10 +19,29 @@ public:
 	Piece(bool is_user_, int type_); // piece without location
 	Piece(bool is_user_, int type_, int x, int z); // piece with location
 	void update() {
-		if (destroyed == true && destroy_cnt < 130) {
+		if (destroyed == true && destroy_cnt < 150) {
+			ps.advanceOneTimeStep(0.001);
 			pc_obj->translate(glm::vec3(0, -0.01f, 0));
 			pc_obj->BindBuffer();
 			destroy_cnt++;
+			for (int p = 0; p < ps.particles.size(); p++) {
+				const TV red = TV(1.0f, 0.0f, 0.0f);
+				const TV blue = TV(0.0f, 1.0f, 0.0f);
+
+				TV& pos(ps.particles[p].pos);
+				TV& vel(ps.particles[p].vel);
+				if (vel.getMagnitude() > 1) {
+					const float alpha = vel.getMagnitude() * 0.5;
+
+					const TV blend_color = alpha * red + (1 - alpha) * blue;
+
+					glPointSize(ps.particles[p].mass * 1);
+					glBegin(GL_POINTS);
+					glColor3fv(blend_color.values_);
+					glVertex3fv(ps.particles[p].pos.values_);
+					glEnd();
+				}
+			}
 		}
 		else {
 			if (destroyed == true) {
@@ -31,6 +52,16 @@ public:
 	}
 	// Removal
 	Piece* destroy() {
+		std::thread dest(playDyingSound);
+		dest.detach();
+		int pos_num = pc_obj->obj_reader.pos_stack_.size();
+		TV* pos_ = new TV[pos_num];
+		for (int i = 0; i < pos_num; i++) {
+			pos_[i].x_ = pc_obj->obj_reader.pos_stack_[i].x;
+			pos_[i].y_ = pc_obj->obj_reader.pos_stack_[i].y;
+			pos_[i].z_ = pc_obj->obj_reader.pos_stack_[i].z;
+		}
+		ps.initParticleSystem(NUM_PARTICLES, pos_, pc_obj->center);
 		destroyed = true;
 		return this;
 	}

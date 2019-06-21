@@ -15,6 +15,7 @@ public:
 	glm::vec4 light_product_specular_ = glm::vec4(0.2f, 0.2f, 0.2f, 1.0f);
 	float mat_shininess_ = 5.0;
 	int num_elements_ = 0;
+	TV center;
 	GL2_Material mat_;
 	OBJReader obj_reader;
 
@@ -225,7 +226,7 @@ public:
 		scale(s, s, s, true);
 	}
 	void obj::scale(const float sx, const float sy, const float sz, const bool centered) {
-		const TV center = getAABB().getCenter();
+		center = getAABB().getCenter();
 
 		const int num = obj_reader.pos_stack_.size();
 
